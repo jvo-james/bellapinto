@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Our Menu | Delicious Bites</title>
+  <title>Delicious Bites</title>
   <!-- Google Fonts: Raleway & Open Sans for variety -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -462,37 +462,39 @@
     };
 
     // Payment integration with Paystack, EmailJS, and FormSubmit
-    function initiatePayment() {
-      const form = document.getElementById('preorderForm');
-      if (!form.checkValidity()) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-      console.log("Payment function triggered");
-      // Get selected dish and calculate amount in Kobo (GHS)
-      const dish = document.getElementById('dish').value;
-      const amount = dishPrices[dish] * 100;
-      
-      // Initiate Paystack payment (replace with your public key)
-      let handler = PaystackPop.setup({
-        key: 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa',
-        email: document.getElementById('email').value,
-        amount: amount,
-        currency: "GHS",
-        ref: ''+Math.floor((Math.random() * 1000000000) + 1),
-        onClose: function(){
-          alert('Payment cancelled.');
-        },
-        callback: function(response){
-          console.log("Payment successful", response);
-          // Payment successful: send email and show modal.
-          sendEmail();
-          showModal();
-          form.reset();
-        }
-      });
-      handler.openIframe();
+   function initiatePayment() {
+  alert("Payment initiated"); // Verify this appears
+  const form = document.getElementById('preorderForm');
+  if (!form.checkValidity()) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+  console.log("Payment function triggered");
+  const dish = document.getElementById('dish').value;
+  if(!dish) {
+    alert("Please select a dish.");
+    return;
+  }
+  const amount = dishPrices[dish] * 100;
+  let handler = PaystackPop.setup({
+    key: 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa',
+    email: document.getElementById('email').value,
+    amount: amount,
+    currency: "GHS",
+    ref: '' + Math.floor((Math.random() * 1000000000) + 1),
+    onClose: function() {
+      alert('Payment cancelled.');
+    },
+    callback: function(response) {
+      console.log("Payment successful", response);
+      sendEmail();
+      showModal();
+      form.reset();
     }
+  });
+  handler.openIframe();
+}
+
     
     // Send email using EmailJS (replace YOUR_SERVICE_ID and YOUR_TEMPLATE_ID)
     function sendEmail() {
@@ -681,7 +683,9 @@
         <textarea id="instructions" rows="3" placeholder="Any dietary preferences or requests?"></textarea>
 
         <!-- Payment Button -->
-        <button type="button" onclick="initiatePayment()">Pay &amp; Confirm Order <i class="fas fa-paper-plane"></i></button>
+       <button type="button" onclick="initiatePayment()">Pay &amp; Confirm Order <i class="fas fa-paper-plane"></i></button>
+
+
       </form>
     </div>
   </section>
