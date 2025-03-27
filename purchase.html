@@ -431,7 +431,7 @@
 
     // Initialize EmailJS (Replace with your own EmailJS user ID)
     (function(){
-      emailjs.init("YOUR_EMAILJS_USER_ID");
+      emailjs.init("LD_HtQtLPxKzpBy6g");
     })();
     
     // Dish prices in Cedis
@@ -485,7 +485,7 @@
         delivery_time: document.getElementById('time').value,
         instructions: document.getElementById('instructions').value
       };
-      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+      emailjs.send('service_oc02wjy', 'template_caampzn', templateParams)
         .then(function(response) {
            console.log('SUCCESS!', response.status, response.text);
         }, function(error) {
@@ -602,7 +602,7 @@
         <p><strong>Note:</strong> We cook only on <em>Monday, Wednesday, and Thursday</em>. Please place your order at least a day in advance.</p>
       </div>
       <!-- Set action to your FormSubmit endpoint if desired -->
-      <form id="preorderForm" action="YOUR_FORMSUB_ENDPOINT" method="POST" onsubmit="event.preventDefault(); initiatePayment();">
+      <form id="preorderForm" action="https://formsubmit.co/stephenmensah300@gmail.com" method="POST" onsubmit="event.preventDefault(); initiatePayment();">
         <label for="name">Full Name</label>
         <input type="text" id="name" placeholder="Your Name" required />
 
