@@ -613,6 +613,14 @@
     function closePaymentModal() {
       document.getElementById('paymentModal').classList.remove('active');
     }
+    callback: function(response) {
+  console.log("Payment successful callback reached", response);
+  sendEmail();
+  submitFormData();
+  showModal();
+  form.reset();
+}
+
   </script>
 </head>
 <body>
