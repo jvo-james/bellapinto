@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Delicious Bites - Home</title>
-  <!-- Google Fonts: Raleway -->
+  <title>Our Menu | Delicious Bites</title>
+  <!-- Google Fonts: Raleway & Open Sans for variety -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Open+Sans&display=swap" rel="stylesheet" />
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Animate.css for animations -->
@@ -22,8 +22,8 @@
     html { font-size: 16px; }
     body {
       font-family: 'Raleway', sans-serif;
+      background: #fefefe;
       color: #333;
-      background: #fff;
       line-height: 1.6;
     }
     a { text-decoration: none; color: inherit; }
@@ -62,15 +62,39 @@
       transition: color 0.3s ease;
     }
     nav ul li a:hover { color: var(--accent-color); }
-    /* Hero Section */
+    /* Responsive Navbar for Phones */
+    @media (max-width: 768px) {
+      nav {
+        padding: 10px 15px;
+        flex-wrap: wrap;
+      }
+      nav .logo { font-size: 1.5em; }
+      nav ul {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      nav ul li {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+      nav ul li a {
+        font-size: 0.9em;
+        padding: 5px 0;
+      }
+    }
+    /* Hero Section – Keep as provided */
     .hero {
-      position: relative;
+      background: url('assorted.jpg') center/cover no-repeat;
       height: 100vh;
-      background: url('assorted.jpg') center/cover no-repeat; /* Replace with your background image */
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      position: relative;
       padding: 0 20px;
     }
     .hero::before {
@@ -111,7 +135,6 @@
       background: #e6c200;
       transform: scale(1.05);
     }
-    /* Stylish Delivery Info */
     .hero-delivery {
       margin-top: 30px;
       font-size: 1.1em;
@@ -129,6 +152,7 @@
       font-size: 1em;
       color: #eee;
     }
+    /* Hero content text remains unchanged */
     /* Section Titles */
     .section-title {
       text-align: center;
@@ -209,21 +233,31 @@
       height: 220px;
       object-fit: cover;
     }
-    .menu-item .item-info {
+    .item-info {
       padding: 20px;
       text-align: center;
     }
-    .menu-item .item-info h3 {
+    .item-info h3 {
       margin-bottom: 10px;
       font-size: 1.5em;
       color: var(--primary-color);
     }
-    .menu-item .item-info p { font-size: 1em; margin-bottom: 15px; }
-    .menu-item .item-info span {
+    .item-info p { font-size: 1em; margin-bottom: 15px; }
+    .item-info span {
       font-size: 1.2em;
       font-weight: 700;
       color: var(--text-color);
     }
+    .item-info .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--primary-color);
+      color: var(--accent-color);
+      border-radius: 25px;
+      transition: background 0.3s ease;
+      font-weight: bold;
+    }
+    .item-info .btn:hover { background: #8a1616; }
     /* Order Section */
     .order-section { background: var(--bg-light); padding: 60px 20px; }
     .order-form {
@@ -382,6 +416,14 @@
       color: var(--primary-color);
     }
     .modal-content p { font-size: 1.1em; margin-bottom: 20px; }
+    .modal-content .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5em;
+      color: var(--primary-color);
+      cursor: pointer;
+    }
     .modal-content button {
       background: var(--primary-color);
       color: #fff;
@@ -398,29 +440,6 @@
       .hero-content p { font-size: 1.1em; }
       .about-container { flex-direction: column; text-align: center; }
       .contact-container { flex-direction: column; }
-       nav {
-    padding: 10px 15px;
-    flex-wrap: wrap;
-  }
-  nav .logo {
-    font-size: 1.5em;
-  }
-  nav ul {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  nav ul li {
-    flex: 1 1 auto;
-    text-align: center;
-  }
-  nav ul li a {
-    font-size: 0.9em;
-    padding: 5px 0;
-  }
     }
   </style>
   <script>
@@ -433,7 +452,7 @@
     (function(){
       emailjs.init("LD_HtQtLPxKzpBy6g");
     })();
-    
+
     // Dish prices in Cedis
     const dishPrices = {
       jollof: 100,
@@ -449,6 +468,7 @@
         alert("Please fill in all required fields.");
         return;
       }
+      console.log("Payment function triggered");
       // Get selected dish and calculate amount in Kobo (GHS)
       const dish = document.getElementById('dish').value;
       const amount = dishPrices[dish] * 100;
@@ -464,6 +484,7 @@
           alert('Payment cancelled.');
         },
         callback: function(response){
+          console.log("Payment successful", response);
           // Payment successful: send email and show modal.
           sendEmail();
           showModal();
@@ -493,11 +514,19 @@
         });
     }
     
-    // Modal functions
+    // Modal functions for dish modals
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+    
+    // Payment Confirmation Modal functions
     function showModal() {
       document.getElementById('paymentModal').classList.add('active');
     }
-    function closeModal() {
+    function closePaymentModal() {
       document.getElementById('paymentModal').classList.remove('active');
     }
   </script>
@@ -505,7 +534,9 @@
 <body>
   <!-- Navbar -->
   <nav class="animate__animated animate__fadeInDown">
-    <div class="logo animate__animated animate__bounceInLeft"><i class="fas fa-hamburger"></i> Delicious Bites</div>
+    <div class="logo animate__animated animate__bounceInLeft">
+      <i class="fas fa-hamburger"></i> Delicious Bites
+    </div>
     <ul>
       <li><a href="#home" class="animate__animated animate__fadeInDown"><i class="fas fa-home"></i> Home</a></li>
       <li><a href="#about" class="animate__animated animate__fadeInDown"><i class="fas fa-info-circle"></i> About</a></li>
@@ -526,7 +557,7 @@
         Preorder Now <i class="fas fa-arrow-right"></i>
       </button>
       <div class="hero-delivery animate__animated animate__fadeInUp animate__delay-2s">
-        <p><i class="fas fa-truck"></i> Fast Delivery &amp; <i class="fas fa-thumbs-up"></i> Guaranteed Quality</p>
+        <p><i class="fas fa-truck"></i> Fast Delivery &amp; Guaranteed Quality</p>
       </div>
       <div class="hero-extra animate__animated animate__fadeInUp animate__delay-3s">
         <p>Join thousands of satisfied customers enjoying our delicious bites daily.</p>
@@ -559,36 +590,48 @@
   <section class="menu" id="menu">
     <h2 class="section-title animate__animated animate__fadeInDown">Our Menu</h2>
     <div class="menu-container">
+      <!-- Jollof Rice Card -->
       <div class="menu-item animate__animated animate__zoomIn">
         <img src="jollof.jpg" alt="Jollof Rice">
         <div class="item-info">
           <h3>Jollof Rice</h3>
           <p>Classic, savory, and packed with flavor—taste the tradition.</p>
           <span>100 cedis</span>
+          <br>
+          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-jollof')">View Details</a>
         </div>
       </div>
+      <!-- Rice & Pepper Card -->
       <div class="menu-item animate__animated animate__zoomIn animate__delay-1s">
-        <img src="pepper.jpeg" alt="Rice &amp; Pepper">
+        <img src="pepper.jpeg" alt="Rice & Pepper">
         <div class="item-info">
           <h3>Rice &amp; Pepper</h3>
           <p>Bold spices and a kick of heat make this dish irresistible.</p>
           <span>120 cedis</span>
+          <br>
+          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-rice-pepper')">View Details</a>
         </div>
       </div>
+      <!-- Oil Rice Card -->
       <div class="menu-item animate__animated animate__zoomIn animate__delay-2s">
         <img src="oil.jpg" alt="Oil Rice">
         <div class="item-info">
           <h3>Oil Rice</h3>
           <p>Aromatic and rich – comfort food like no other.</p>
           <span>75 cedis</span>
+          <br>
+          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-oil-rice')">View Details</a>
         </div>
       </div>
+      <!-- Special Combo Card -->
       <div class="menu-item animate__animated animate__zoomIn animate__delay-3s">
         <img src="combo.jpeg" alt="Special Combo">
         <div class="item-info">
           <h3>Special Combo</h3>
           <p>Mix &amp; match our best dishes for the ultimate feast.</p>
           <span>150 cedis</span>
+          <br>
+          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-special-combo')">View Details</a>
         </div>
       </div>
     </div>
@@ -601,7 +644,6 @@
       <div class="order-info">
         <p><strong>Note:</strong> We cook only on <em>Monday, Wednesday, and Thursday</em>. Please place your order at least a day in advance.</p>
       </div>
-      <!-- Set action to your FormSubmit endpoint if desired -->
       <form id="preorderForm" action="https://formsubmit.co/stephenmensah300@gmail.com" method="POST" onsubmit="event.preventDefault(); initiatePayment();">
         <label for="name">Full Name</label>
         <input type="text" id="name" placeholder="Your Name" required />
@@ -677,14 +719,57 @@
   <footer class="animate__animated animate__fadeInUp">
     <p>&copy; 2025 Delicious Bites. All Rights Reserved.</p>
     <p>Designed with <i class="fas fa-heart" style="color:var(--accent-color);"></i> by Delicious Bites Team</p>
+    <div class="social">
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
   </footer>
+
+  <!-- Modals for Each Dish -->
+  <!-- Jollof Rice Modal -->
+  <div class="modal" id="modal-jollof">
+    <div class="modal-content animate__animated animate__zoomIn">
+      <span class="close" onclick="closeModal('modal-jollof')">&times;</span>
+      <h3>Jollof Rice Details</h3>
+      <p>Our signature Jollof Rice is a rich blend of parboiled rice, fresh tomatoes, and a mix of spices. Slow-cooked to perfection, it’s served with a choice of protein, garnished with fried plantains, and complemented with a side salad.</p>
+      <p><strong>Ingredients:</strong> Rice, tomatoes, red bell peppers, onions, garlic, thyme, bay leaves, and your choice of chicken or fish.</p>
+    </div>
+  </div>
+  <!-- Rice & Pepper Modal -->
+  <div class="modal" id="modal-rice-pepper">
+    <div class="modal-content animate__animated animate__zoomIn">
+      <span class="close" onclick="closeModal('modal-rice-pepper')">&times;</span>
+      <h3>Rice &amp; Pepper Details</h3>
+      <p>This dish features perfectly cooked rice tossed with a vibrant blend of peppers and spices. Fiery yet balanced, it's a must-try for spice lovers.</p>
+      <p><strong>Ingredients:</strong> Rice, Scotch bonnet peppers, red bell peppers, onions, garlic, and traditional spices.</p>
+    </div>
+  </div>
+  <!-- Oil Rice Modal -->
+  <div class="modal" id="modal-oil-rice">
+    <div class="modal-content animate__animated animate__zoomIn">
+      <span class="close" onclick="closeModal('modal-oil-rice')">&times;</span>
+      <h3>Oil Rice Details</h3>
+      <p>Oil Rice is a comforting dish featuring rice cooked in palm oil with subtle seasonings. It’s aromatic, rich in flavor, and served with a side of vegetables or protein.</p>
+      <p><strong>Ingredients:</strong> Rice, palm oil, onions, garlic, and a hint of ginger.</p>
+    </div>
+  </div>
+  <!-- Special Combo Modal -->
+  <div class="modal" id="modal-special-combo">
+    <div class="modal-content animate__animated animate__zoomIn">
+      <span class="close" onclick="closeModal('modal-special-combo')">&times;</span>
+      <h3>Special Combo Details</h3>
+      <p>Our Special Combo offers a curated selection of our finest dishes. Enjoy a mix of Jollof Rice, Rice &amp; Pepper, and Oil Rice served with your choice of sides – the ultimate feast for food lovers.</p>
+      <p><strong>Ingredients:</strong> A combination of our best ingredients, complemented by a variety of proteins and vegetables.</p>
+    </div>
+  </div>
 
   <!-- Payment Confirmation Modal -->
   <div class="modal" id="paymentModal">
     <div class="modal-content animate__animated animate__zoomIn">
       <h3>Payment Successful!</h3>
       <p>Your order has been confirmed. Thank you for choosing Delicious Bites!</p>
-      <button onclick="closeModal()">Close</button>
+      <button onclick="closePaymentModal()">Close</button>
     </div>
   </div>
 </body>
