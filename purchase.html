@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delicious Bites - Home</title>
+  <!-- Google Fonts: Raleway -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Animate.css for animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+  <!-- Paystack Inline Script -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <style>
+    /* Global Styles */
+    * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'Raleway', sans-serif;
+      color: #333;
+      background: #fff;
+      line-height: 1.6;
+    }
+    a { text-decoration: none; color: inherit; }
+    /* Color Palette */
+    :root {
+      --primary-color: #B22222; /* Rich Red */
+      --accent-color: #FFD700;  /* Warm Gold */
+      --bg-light: #fff;
+      --text-color: #333;
+    }
+    /* Navbar */
+    nav {
+      background: var(--primary-color);
+      padding: 15px 30px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav .logo {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    nav .logo i { color: var(--accent-color); }
+    nav ul { list-style: none; display: flex; gap: 25px; }
+    nav ul li a {
+      color: #fff;
+      font-size: 1em;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    nav ul li a:hover { color: var(--accent-color); }
+    /* Hero Section */
+    .hero {
+      position: relative;
+      height: 100vh;
+      background: url('assorted.jpg') center/cover no-repeat; /* Replace with your background image */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      color: #fff;
+      max-width: 800px;
+      padding: 20px;
+    }
+    .hero-content h1 {
+      font-size: 4em;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .hero-content p {
+      font-size: 1.4em;
+      margin-bottom: 30px;
+    }
+    .hero-content .btn {
+      background: var(--accent-color);
+      color: var(--primary-color);
+      padding: 15px 40px;
+      font-size: 1em;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .hero-content .btn:hover {
+      background: #e6c200;
+      transform: scale(1.05);
+    }
+    /* Stylish Delivery Info */
+    .hero-delivery {
+      margin-top: 30px;
+      font-size: 1.1em;
+      line-height: 1.4;
+      color: var(--accent-color);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .hero-extra {
+      margin-top: 20px;
+      font-size: 1em;
+      color: #eee;
+    }
+    /* Section Titles */
+    .section-title {
+      text-align: center;
+      margin: 100px 0 50px;
+      font-size: 2.5em;
+      font-weight: 700;
+      color: var(--primary-color);
+      position: relative;
+    }
+    .section-title::after {
+      content: "";
+      width: 60px;
+      height: 4px;
+      background: var(--accent-color);
+      display: block;
+      margin: 10px auto 0;
+      border-radius: 2px;
+    }
+    /* About Section */
+    .about { padding: 60px 20px; background: var(--bg-light); }
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-text { flex: 1 1 400px; }
+    .about-text h2 {
+      font-size: 2.2em;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+    .about-text p {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+    .about-icons { display: flex; gap: 20px; margin-top: 20px; }
+    .about-icons div { text-align: center; }
+    .about-icons div i {
+      font-size: 2em;
+      color: var(--accent-color);
+      margin-bottom: 10px;
+    }
+    .about-icons div span {
+      display: block;
+      font-weight: 700;
+    }
+    .about-image { flex: 1 1 400px; text-align: center; }
+    .about-image img {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    /* Menu Section */
+    .menu { padding: 60px 20px; background: var(--bg-light); }
+    .menu-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    .menu-item {
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .menu-item:hover { transform: translateY(-5px); }
+    .menu-item img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+    .menu-item .item-info {
+      padding: 20px;
+      text-align: center;
+    }
+    .menu-item .item-info h3 {
+      margin-bottom: 10px;
+      font-size: 1.5em;
+      color: var(--primary-color);
+    }
+    .menu-item .item-info p { font-size: 1em; margin-bottom: 15px; }
+    .menu-item .item-info span {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+    /* Order Section */
+    .order-section { background: var(--bg-light); padding: 60px 20px; }
+    .order-form {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #f7f7f7;
+      border-radius: 10px;
+      padding: 40px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .order-form h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: var(--primary-color);
+    }
+    .order-form label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+    .order-form input,
+    .order-form select,
+    .order-form textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 1em;
+    }
+    .order-form button {
+      width: 100%;
+      background: var(--primary-color);
+      color: #fff;
+      padding: 15px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .order-form button:hover { background: #8b1a1a; }
+    .order-info {
+      font-size: 0.95em;
+      margin-bottom: 20px;
+      background: #fff3cd;
+      padding: 10px;
+      border-left: 4px solid var(--accent-color);
+      border-radius: 4px;
+      color: var(--primary-color);
+    }
+    /* Contact Section */
+    .contact-section {
+      padding: 60px 20px;
+      text-align: center;
+      background: var(--bg-light);
+    }
+    .contact-section p { font-size: 1.1em; margin-bottom: 10px; }
+    .contact-section a { color: var(--primary-color); font-weight: 700; }
+    .contact-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .contact-info,
+    .contact-form {
+      border: 2px solid var(--primary-color);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    /* For larger screens (PC) */
+    @media (min-width: 768px) {
+      .contact-container {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+      }
+      .contact-info { flex: 1; max-width: 45%; text-align: left; }
+      .contact-form { flex: 1; max-width: 45%; text-align: left; }
+    }
+    .contact-form label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 1em;
+    }
+    .contact-form button {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .contact-form button:hover { background: #8b1a1a; }
+    .social a {
+      color: var(--accent-color);
+      margin: 0 10px;
+      font-size: 1.5em;
+      transition: color 0.3s ease;
+    }
+    .social a:hover { color: #e6c200; }
+    /* Footer */
+    footer {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    footer p { margin-bottom: 5px; }
+    footer .social a {
+      color: var(--accent-color);
+      margin: 0 10px;
+      font-size: 1.3em;
+      transition: color 0.3s ease;
+    }
+    footer .social a:hover { color: #e6c200; }
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: var(--bg-light);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+    }
+    .modal-content h3 {
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+    .modal-content p { font-size: 1.1em; margin-bottom: 20px; }
+    .modal-content button {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .modal-content button:hover { background: #8b1a1a; }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero-content h1 { font-size: 2.8em; }
+      .hero-content p { font-size: 1.1em; }
+      .about-container { flex-direction: column; text-align: center; }
+      .contact-container { flex-direction: column; }
+    }
+  </style>
+  <script>
+    // Scroll to top on page load
+    window.onload = function() {
+      window.scrollTo(0, 0);
+    };
+
+    // Initialize EmailJS (Replace with your own EmailJS user ID)
+    (function(){
+      emailjs.init("YOUR_EMAILJS_USER_ID");
+    })();
+    
+    // Dish prices in Cedis
+    const dishPrices = {
+      jollof: 100,
+      "rice-pepper": 120,
+      "oil-rice": 75,
+      "special-combo": 150
+    };
+
+    // Payment integration with Paystack, EmailJS, and FormSubmit
+    function initiatePayment() {
+      const form = document.getElementById('preorderForm');
+      if (!form.checkValidity()) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+      // Get selected dish and calculate amount in Kobo (GHS)
+      const dish = document.getElementById('dish').value;
+      const amount = dishPrices[dish] * 100;
+      
+      // Initiate Paystack payment (replace with your public key)
+      let handler = PaystackPop.setup({
+        key: 'YOUR_PAYSTACK_PUBLIC_KEY',
+        email: document.getElementById('email').value,
+        amount: amount,
+        currency: "GHS",
+        ref: ''+Math.floor((Math.random() * 1000000000) + 1),
+        onClose: function(){
+          alert('Payment cancelled.');
+        },
+        callback: function(response){
+          // Payment successful: send email and show modal.
+          sendEmail();
+          showModal();
+          form.reset();
+        }
+      });
+      handler.openIframe();
+    }
+    
+    // Send email using EmailJS (replace YOUR_SERVICE_ID and YOUR_TEMPLATE_ID)
+    function sendEmail() {
+      const templateParams = {
+        from_name: document.getElementById('name').value,
+        to_email: document.getElementById('email').value,
+        dish: document.getElementById('dish').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        delivery_date: document.getElementById('date').value,
+        delivery_time: document.getElementById('time').value,
+        instructions: document.getElementById('instructions').value
+      };
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        .then(function(response) {
+           console.log('SUCCESS!', response.status, response.text);
+        }, function(error) {
+           console.log('FAILED...', error);
+        });
+    }
+    
+    // Modal functions
+    function showModal() {
+      document.getElementById('paymentModal').classList.add('active');
+    }
+    function closeModal() {
+      document.getElementById('paymentModal').classList.remove('active');
+    }
+  </script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="animate__animated animate__fadeInDown">
+    <div class="logo animate__animated animate__bounceInLeft"><i class="fas fa-hamburger"></i> Delicious Bites</div>
+    <ul>
+      <li><a href="#home" class="animate__animated animate__fadeInDown"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="#about" class="animate__animated animate__fadeInDown"><i class="fas fa-info-circle"></i> About</a></li>
+      <li><a href="#menu" class="animate__animated animate__fadeInDown"><i class="fas fa-utensils"></i> Menu</a></li>
+      <li><a href="#order" class="animate__animated animate__fadeInDown"><i class="fas fa-shopping-cart"></i> Preorder</a></li>
+      <li><a href="#contact" class="animate__animated animate__fadeInDown"><i class="fas fa-envelope"></i> Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content animate__animated animate__fadeInUp">
+      <h1 class="animate__animated animate__jackInTheBox">Fresh &amp; Flavorful</h1>
+      <p class="animate__animated animate__fadeInUp animate__delay-1s">
+        Experience our gourmet home-cooked meals, crafted with passion and bursting with exquisite flavor. Elevate your dining experience with every bite!
+      </p>
+      <button class="btn animate__animated animate__pulse animate__infinite" onclick="document.getElementById('order').scrollIntoView({ behavior: 'smooth' });">
+        Preorder Now <i class="fas fa-arrow-right"></i>
+      </button>
+      <div class="hero-delivery animate__animated animate__fadeInUp animate__delay-2s">
+        <p><i class="fas fa-truck"></i> Fast Delivery &amp; <i class="fas fa-thumbs-up"></i> Guaranteed Quality</p>
+      </div>
+      <div class="hero-extra animate__animated animate__fadeInUp animate__delay-3s">
+        <p>Join thousands of satisfied customers enjoying our delicious bites daily.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" id="about">
+    <h2 class="section-title animate__animated animate__fadeInDown">About Us</h2>
+    <div class="about-container">
+      <div class="about-text animate__animated animate__fadeInLeft">
+        <h2>Our Story</h2>
+        <p>
+          At Delicious Bites, every meal is a celebration of taste and tradition. We blend time-honored recipes with modern twists to deliver an unforgettable dining experience. Our chefs use only the freshest ingredients to create culinary masterpieces that warm your heart.
+        </p>
+        <div class="about-icons">
+          <div class="animate__animated animate__zoomIn"><i class="fas fa-leaf"></i><span>Fresh Ingredients</span></div>
+          <div class="animate__animated animate__zoomIn animate__delay-1s"><i class="fas fa-fire"></i><span>Expertly Cooked</span></div>
+          <div class="animate__animated animate__zoomIn animate__delay-2s"><i class="fas fa-smile"></i><span>Happy Customers</span></div>
+        </div>
+      </div>
+      <div class="about-image animate__animated animate__fadeInRight">
+        <img src="jollof.jpg" alt="Our Kitchen" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Menu Section -->
+  <section class="menu" id="menu">
+    <h2 class="section-title animate__animated animate__fadeInDown">Our Menu</h2>
+    <div class="menu-container">
+      <div class="menu-item animate__animated animate__zoomIn">
+        <img src="jollof.jpg" alt="Jollof Rice">
+        <div class="item-info">
+          <h3>Jollof Rice</h3>
+          <p>Classic, savory, and packed with flavor—taste the tradition.</p>
+          <span>100 cedis</span>
+        </div>
+      </div>
+      <div class="menu-item animate__animated animate__zoomIn animate__delay-1s">
+        <img src="pepper.jpeg" alt="Rice &amp; Pepper">
+        <div class="item-info">
+          <h3>Rice &amp; Pepper</h3>
+          <p>Bold spices and a kick of heat make this dish irresistible.</p>
+          <span>120 cedis</span>
+        </div>
+      </div>
+      <div class="menu-item animate__animated animate__zoomIn animate__delay-2s">
+        <img src="oil.jpg" alt="Oil Rice">
+        <div class="item-info">
+          <h3>Oil Rice</h3>
+          <p>Aromatic and rich – comfort food like no other.</p>
+          <span>75 cedis</span>
+        </div>
+      </div>
+      <div class="menu-item animate__animated animate__zoomIn animate__delay-3s">
+        <img src="combo.jpeg" alt="Special Combo">
+        <div class="item-info">
+          <h3>Special Combo</h3>
+          <p>Mix &amp; match our best dishes for the ultimate feast.</p>
+          <span>150 cedis</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order Section -->
+  <section class="order-section" id="order">
+    <div class="order-form animate__animated animate__fadeInUp">
+      <h2>Place Your Preorder</h2>
+      <div class="order-info">
+        <p><strong>Note:</strong> We cook only on <em>Monday, Wednesday, and Thursday</em>. Please place your order at least a day in advance.</p>
+      </div>
+      <!-- Set action to your FormSubmit endpoint if desired -->
+      <form id="preorderForm" action="YOUR_FORMSUB_ENDPOINT" method="POST" onsubmit="event.preventDefault(); initiatePayment();">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="Your Name" required />
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" required />
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" placeholder="e.g., +123456789" required />
+
+        <label for="address">Delivery Address</label>
+        <input type="text" id="address" placeholder="Street, City, ZIP" required />
+
+        <label for="dish">Select Dish</label>
+        <select id="dish" required>
+          <option value="">-- Choose a Dish --</option>
+          <option value="jollof">Jollof Rice</option>
+          <option value="rice-pepper">Rice &amp; Pepper</option>
+          <option value="oil-rice">Oil Rice</option>
+          <option value="special-combo">Special Combo</option>
+        </select>
+
+        <label for="date">Delivery Date <small>(Orders must be placed a day before cooking day)</small></label>
+        <input type="date" id="date" required />
+
+        <label for="time">Preferred Delivery Time</label>
+        <select id="time" required>
+          <option value="">-- Choose a Time Slot --</option>
+          <option value="11am-1pm">11 AM - 1 PM</option>
+          <option value="1pm-3pm">1 PM - 3 PM</option>
+          <option value="3pm-5pm">3 PM - 5 PM</option>
+        </select>
+
+        <label for="instructions">Special Instructions</label>
+        <textarea id="instructions" rows="3" placeholder="Any dietary preferences or requests?"></textarea>
+
+        <!-- Payment Button -->
+        <button type="button" onclick="initiatePayment()">Pay &amp; Confirm Order <i class="fas fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section" id="contact">
+    <h2 class="section-title animate__animated animate__fadeInDown">Get in Touch</h2>
+    <p class="animate__animated animate__fadeInUp">Have questions? We'd love to hear from you!</p>
+    <div class="contact-container">
+      <div class="contact-info animate__animated animate__fadeInUp">
+        <p><i class="fas fa-envelope"></i> Email: <a href="mailto:info@deliciousbites.com">info@deliciousbites.com</a></p>
+        <p><i class="fas fa-phone"></i> Phone: <strong>+123 456 7890</strong></p>
+        <p><i class="fas fa-map-marker-alt"></i> Address: 123 Food Street, Flavor Town</p>
+      </div>
+      <div class="contact-form animate__animated animate__fadeInUp animate__delay-1s">
+        <form action="YOUR_FORMSUB_ENDPOINT_FOR_CONTACT" method="POST">
+          <label for="contactName">Your Name</label>
+          <input type="text" id="contactName" name="contactName" placeholder="Your Name" required />
+          <label for="contactEmail">Your Email</label>
+          <input type="email" id="contactEmail" name="contactEmail" placeholder="you@example.com" required />
+          <label for="contactMessage">Your Message</label>
+          <textarea id="contactMessage" name="contactMessage" rows="4" placeholder="Type your message here..." required></textarea>
+          <button type="submit">Send Message <i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="social animate__animated animate__bounceIn" style="margin-top:20px;">
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="animate__animated animate__fadeInUp">
+    <p>&copy; 2025 Delicious Bites. All Rights Reserved.</p>
+    <p>Designed with <i class="fas fa-heart" style="color:var(--accent-color);"></i> by Delicious Bites Team</p>
+  </footer>
+
+  <!-- Payment Confirmation Modal -->
+  <div class="modal" id="paymentModal">
+    <div class="modal-content animate__animated animate__zoomIn">
+      <h3>Payment Successful!</h3>
+      <p>Your order has been confirmed. Thank you for choosing Delicious Bites!</p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</body>
+</html>
