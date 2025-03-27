@@ -29,8 +29,8 @@
     a { text-decoration: none; color: inherit; }
     /* Color Palette */
     :root {
-      --primary-color: #B22222; /* Rich Red */
-      --accent-color: #FFD700;  /* Warm Gold */
+      --primary-color: #B22222;
+      --accent-color: #FFD700;
       --bg-light: #fff;
       --text-color: #333;
     }
@@ -62,12 +62,9 @@
       transition: color 0.3s ease;
     }
     nav ul li a:hover { color: var(--accent-color); }
-    /* Responsive Navbar for Phones */
+    /* Responsive Navbar */
     @media (max-width: 768px) {
-      nav {
-        padding: 10px 15px;
-        flex-wrap: wrap;
-      }
+      nav { padding: 10px 15px; flex-wrap: wrap; }
       nav .logo { font-size: 1.5em; }
       nav ul {
         width: 100%;
@@ -80,7 +77,7 @@
       nav ul li { flex: 1 1 auto; text-align: center; }
       nav ul li a { font-size: 0.9em; padding: 5px 0; }
     }
-    /* Hero Section – remains unchanged */
+    /* Hero Section */
     .hero {
       background: url('assorted.jpg') center/cover no-repeat;
       height: 100vh;
@@ -377,7 +374,7 @@
       transition: color 0.3s ease;
     }
     footer .social a:hover { color: #e6c200; }
-    /* Modal Styles */
+    /* Modal Styles (not used now, but left for reference) */
     .modal {
       position: fixed;
       top: 0; left: 0;
@@ -392,8 +389,8 @@
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .modal.active {
-      opacity: 1;
-      visibility: visible;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .modal-content {
       background: var(--bg-light);
@@ -442,14 +439,14 @@
     };
 
     document.addEventListener("DOMContentLoaded", function() {
-      // Initialize EmailJS
+      // Initialize EmailJS with your user ID
       if (window.emailjs) {
-        emailjs.init("qmz9hmmrmjlWOziHU");
+        emailjs.init("qmz9hmmrmjlWOziHU"); // Replace with your EmailJS user ID
       } else {
         console.error("EmailJS failed to load.");
       }
       
-      // Attach event listener to payment button
+      // Attach event listener to the payment button
       const payButton = document.getElementById("paystack-button");
       if (payButton) {
         payButton.addEventListener("click", function(e) {
@@ -469,7 +466,7 @@
       "special-combo": 150
     };
 
-    // Function to submit form data using FormSubmit
+    // Function to submit form data using FormSubmit via fetch
     function submitFormData() {
       const form = document.getElementById("preorderForm");
       const formData = new FormData(form);
@@ -506,7 +503,7 @@
       const amount = dishPrices[dish] * 100;
       
       let handler = PaystackPop.setup({
-        key: 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa',
+        key: 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa', // Replace with your Paystack test key
         email: document.getElementById('email').value,
         amount: amount,
         currency: "GHS",
@@ -518,8 +515,8 @@
           console.log("Payment successful", response);
           sendEmail();
           submitFormData();
-          showModal();
-          form.reset();
+          // Redirect to success page after successful payment
+          window.location.href = "success.html";
         }
       });
       handler.openIframe();
@@ -539,9 +536,9 @@
       };
       emailjs.send('service_oc02wjy', 'template_caampzn', templateParams)
         .then(function(response) {
-          console.log('SUCCESS!', response.status, response.text);
+          console.log('EmailJS SUCCESS!', response.status, response.text);
         }, function(error) {
-          console.log('FAILED...', error);
+          console.log('EmailJS FAILED...', error);
         });
     }
 
@@ -592,7 +589,7 @@
       return isValid;
     }
 
-    // Modal functions for dish modals
+    // Modal functions for dish modals (if needed)
     function openModal(modalId) {
       document.getElementById(modalId).classList.add('active');
     }
@@ -600,7 +597,7 @@
       document.getElementById(modalId).classList.remove('active');
     }
 
-    // Payment Confirmation Modal functions
+    // Payment Confirmation Modal functions (not used with redirection)
     function showModal() {
       const modal = document.getElementById('paymentModal');
       if (modal) {
@@ -613,14 +610,6 @@
     function closePaymentModal() {
       document.getElementById('paymentModal').classList.remove('active');
     }
-    callback: function(response) {
-  console.log("Payment successful callback reached", response);
-  sendEmail();
-  submitFormData();
-  showModal();
-  form.reset();
-}
-
   </script>
 </head>
 <body>
@@ -688,6 +677,8 @@
         <div class="item-info">
           <h3>Jollof Rice</h3>
           <p>Classic, savory, and packed with flavor—taste the tradition.</p>
+ <p class="ingredients"><i class="fas fa-leaf"></i> Tomato, pepper, onion, and herbs</p>
+
           <span>100 cedis</span>
           <br>
           <a href="javascript:void(0)" class="btn" onclick="openModal('modal-jollof')">View Details</a>
@@ -699,6 +690,8 @@
         <div class="item-info">
           <h3>Rice &amp; Pepper</h3>
           <p>Bold spices and a kick of heat make this dish irresistible.</p>
+ <p class="ingredients"><i class="fas fa-fire"></i> Scotch bonnet, red pepper, and spices</p>
+
           <span>120 cedis</span>
           <br>
           <a href="javascript:void(0)" class="btn" onclick="openModal('modal-rice-pepper')">View Details</a>
@@ -710,6 +703,8 @@
         <div class="item-info">
           <h3>Oil Rice</h3>
           <p>Aromatic and rich – comfort food like no other.</p>
+  <p class="ingredients"><i class="fas fa-smile"></i> Palm oil, spices, and a hint of ginger</p>
+
           <span>75 cedis</span>
           <br>
           <a href="javascript:void(0)" class="btn" onclick="openModal('modal-oil-rice')">View Details</a>
@@ -721,6 +716,7 @@
         <div class="item-info">
           <h3>Special Combo</h3>
           <p>Mix &amp; match our best dishes for the ultimate feast.</p>
+<p class="ingredients"><i class="fas fa-utensils"></i> A selection of our top dishes</p>
           <span>150 cedis</span>
           <br>
           <a href="javascript:void(0)" class="btn" onclick="openModal('modal-special-combo')">View Details</a>
@@ -856,7 +852,7 @@
     </div>
   </div>
 
-  <!-- Payment Confirmation Modal -->
+  <!-- Payment Confirmation Modal (Unused with redirection) -->
   <div class="modal" id="paymentModal">
     <div class="modal-content animate__animated animate__zoomIn">
       <h3>Payment Successful!</h3>
