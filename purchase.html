@@ -675,9 +675,17 @@
   
         <!-- Payment Button -->
         <button type="button" id="paystack-button">Pay &amp; Confirm Order <i class="fas fa-paper-plane"></i></button>
-        <button onclick="copyReference()">Copy Transaction Reference</button>
+      
 
       </form>
+      <div id="confirmationMessage" style="display:none; margin-top:1em; color:green; font-weight:bold;"></div>
+<div id="copyRefContainer" style="display:none; margin-top:1em;">
+  <p>Your transaction reference is: <span id="transactionRef"></span></p>
+  <button onclick="copyReference()">Copy Reference</button>
+</div>
+
+</div>
+
     </div>
   </section>
   
@@ -859,29 +867,32 @@
         onClose: function () {
           alert("Payment cancelled or unsuccessful. Please try again.");
         },
-        callback: function (response) {
-          console.log("Payment successful. Ref:", response.reference);
-           // Set the reference number in the form
-           document.getElementById("reference").value = response.reference;
-          // Show order confirmation with instructions
-          alert("Your order has been confirmed!\n\nPlease note:\n• Your order will be prepared shortly.\n• Kindly await delivery confirmation via email or SMS.\n• Keep your transaction reference: " + response.reference);
-          // Now submit the form data via FormSubmit and then refresh the page
-          submitFormData();
-        }
-      });
-      handler.openIframe();
-    }
+      callback: function (response) {
+  console.log("Payment successful. Ref:", response.reference);
+  // Set the reference number in the form
+  document.getElementById("reference").value = response.reference;
+  // Update and show the confirmation message
+  const confMsg = document.getElementById("confirmationMessage");
+  confMsg.innerHTML = "Your order has been confirmed!<br>Please note:<br>&bull; Your order will be prepared shortly.<br>&bull; Kindly await delivery confirmation via email or SMS.<br>&bull; Transaction Reference: " + response.reference;
+  confMsg.style.display = "block";
+  // Update and show the copy reference container
+  document.getElementById("transactionRef").textContent = response.reference;
+  document.getElementById("copyRefContainer").style.display = "block";
+  // Now submit the form data via FormSubmit after a delay
+  setTimeout(submitFormData, 3000);
+}
 
-    function copyReference() {
+   function copyReference() {
   const ref = document.getElementById("reference").value;
   navigator.clipboard.writeText(ref)
     .then(() => {
       alert("Reference copied to clipboard: " + ref);
     })
     .catch(err => {
-      alert("Failed to copy reference. Please copy it manually: " + ref);
+      alert("Unable to copy reference. Please copy manually: " + ref);
     });
 }
+
 
 document.getElementById("preorderForm").addEventListener("submit", function(e) {
   e.preventDefault();
