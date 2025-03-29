@@ -479,7 +479,7 @@
         text-align: center;
       }
     }
-@media (max-width: 768px) {
+    @media (max-width: 768px) {
       .hero-content h1 { font-size: 2.8em; }
       .hero-content p { font-size: 1.1em; }
       .about-container { flex-direction: column; text-align: center; }
@@ -625,9 +625,8 @@
         <p><strong>Note:</strong> We operate on select days – please order at least one day in advance.</p>
         <p>Choose an individual portion or our bulk package (300 cedis) to store and enjoy later.</p>
       </div>
-        <!-- Hidden input _next to enable redirection via FormSubmit -->
+      <!-- Hidden input _next to enable redirection via FormSubmit is removed -->
       <form id="preorderForm" action="https://formsubmit.co/jadelstech@gmail.com" method="POST">
-         
         <label for="name">Full Name</label>
         <input type="text" id="name" name="name" placeholder="Your Name" required />
   
@@ -757,12 +756,11 @@
     </div>
   </div>
   
-  
- <script>
-  // Scroll to top on page load
-  window.onload = function() {
-    window.scrollTo(0, 0);
-  };
+  <script>
+    // Scroll to top on page load
+    window.onload = function() {
+      window.scrollTo(0, 0);
+    };
 
     document.addEventListener("DOMContentLoaded", function () {
       console.log("DOM fully loaded.");
@@ -790,56 +788,54 @@
     };
 
     // Basic form validation
-  function validateForm() {
-    const name = document.getElementById("name");
-    const email = document.getElementById("email");
-    const phone = document.getElementById("phone");
-    const address = document.getElementById("address");
-    const dish = document.getElementById("dish");
-    const portion = document.getElementById("portion");
-    const date = document.getElementById("date");
-    const time = document.getElementById("time");
+    function validateForm() {
+      const name = document.getElementById("name");
+      const email = document.getElementById("email");
+      const phone = document.getElementById("phone");
+      const address = document.getElementById("address");
+      const dish = document.getElementById("dish");
+      const portion = document.getElementById("portion");
+      const date = document.getElementById("date");
+      const time = document.getElementById("time");
 
-    let isValid = true;
-    let errorMessages = [];
+      let isValid = true;
+      let errorMessages = [];
 
-    if (!/^\S+\s+\S+/.test(name.value.trim())) {
-      errorMessages.push("Please enter your FULL NAME (first and last).");
-      isValid = false;
+      if (!/^\S+\s+\S+/.test(name.value.trim())) {
+        errorMessages.push("Please enter your FULL NAME (first and last).");
+        isValid = false;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+        errorMessages.push("Please enter a valid email address.");
+        isValid = false;
+      }
+
+      if (!/^\d{10}$/.test(phone.value.trim())) {
+        errorMessages.push("Please enter a valid 10-digit phone number.");
+        isValid = false;
+      }
+
+      if (address.value.trim() === "") {
+        errorMessages.push("Please enter your residential address.");
+        isValid = false;
+      }
+
+      if (!dish.value) {
+        errorMessages.push("Please select a dish.");
+        isValid = false;
+      }
+      
+      if (!portion.value) {
+        errorMessages.push("Please select a portion type.");
+        isValid = false;
+      }
+
+      if (!isValid) {
+        alert("⚠️ Please fix the following errors before proceeding:\n\n" + errorMessages.join("\n"));
+      }
+      return isValid;
     }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-      errorMessages.push("Please enter a valid email address.");
-      isValid = false;
-    }
-
-    if (!/^\d{10}$/.test(phone.value.trim())) {
-      errorMessages.push("Please enter a valid 10-digit phone number.");
-      isValid = false;
-    }
-
-    if (address.value.trim() === "") {
-      errorMessages.push("Please enter your residential address.");
-      isValid = false;
-    }
-
-    if (!dish.value) {
-      errorMessages.push("Please select a dish.");
-      isValid = false;
-    }
-    
-    if (!portion.value) {
-      errorMessages.push("Please select a portion type.");
-      isValid = false;
-    }
-
-    if (!isValid) {
-      alert("⚠️ Please fix the following errors before proceeding:\n\n" + errorMessages.join("\n"));
-    }
-    return isValid;
-  }
-
-
 
     function payWithPaystack() {
       console.log("Initiating Paystack payment...");
@@ -871,30 +867,21 @@
 
     function submitFormData() {
       console.log("Submitting form data via FormSubmit...");
-      const form = document.getElementById("preorderForm");
-      const formData = new FormData(form);
-      // Use fetch to POST to FormSubmit
-      fetch(form.action, {
-        method: "POST",
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      })
-      .then(response => {
-         if (response.ok) {
-           console.log("Form submitted successfully.");
-           // Refresh the page to clear fields
-           location.reload();
-         } else {
-           console.error("Form submission failed.");
-           alert("There was an error processing your order. Please try again.");
-         }
-      })
-      .catch(error => {
-         console.error("Form submission error:", error);
-         alert("There was an error processing your order. Please try again.");
-      });
+      // Simply submit the form normally.
+      document.getElementById("preorderForm").submit();
+      // Refresh the page after a short delay to clear fields.
+      setTimeout(function() {
+        location.reload();
+      }, 2000);
     }
-    </script></body>
+
+    // Optional modal functions for dish details
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add("active");
+    }
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove("active");
+    }
+  </script>
+</body>
 </html>
