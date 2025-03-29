@@ -895,23 +895,25 @@
       onClose: function () {
         alert("Payment cancelled or unsuccessful. Please try again.");
       },
-      callback: function (response) {
-        console.log("Payment successful. Ref:", response.reference);
-        // Set the reference number in the form
-        document.getElementById("reference").value = response.reference;
-        // Update and show the confirmation message
-        const confMsg = document.getElementById("confirmationMessage");
-        confMsg.innerHTML = "Your order has been confirmed!<br>Please note:<br>&bull; Your order will be prepared shortly.<br>&bull; Kindly await delivery confirmation via email or SMS.<br>&bull; Transaction Reference: " + response.reference;
-        confMsg.style.display = "block";
-        // Update and show the copy reference container
-        document.getElementById("transactionRef").textContent = response.reference;
-        document.getElementById("copyRefContainer").style.display = "block";
-        // Now submit the form data via FormSubmit after a delay (3 seconds)
-        setTimeout(submitFormData, 3000);
-      }
+     callback: function (response) {
+  console.log("Payment successful. Ref:", response.reference);
+  // Set the reference number in the hidden input field
+  document.getElementById("reference").value = response.reference;
+  // Update and show the confirmation message with an OK button
+  const confMsg = document.getElementById("confirmationMessage");
+  confMsg.innerHTML = "Your order has been confirmed!<br>Please note:<br>&bull; Your order will be prepared shortly.<br>&bull; Kindly await delivery confirmation via email or SMS.<br>&bull; Transaction Reference: " + response.reference + "<br><button id='confirmOrderButton' onclick='confirmOrder()'>OK</button>";
+  confMsg.style.display = "block";
+  // Update and show the copy reference container
+  document.getElementById("transactionRef").textContent = response.reference;
+  document.getElementById("copyRefContainer").style.display = "block";
+}
+
     });
     handler.openIframe();
   }
+function confirmOrder() {
+  submitFormData();
+}
 
   function submitFormData() {
     console.log("Submitting form data via FormSubmit using fetch...");
