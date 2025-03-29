@@ -761,22 +761,26 @@
   </div>
 </div>
 
-  <!-- Confirmation Modal -->
+<!-- Hidden input for transaction reference -->
+<input type="hidden" id="reference" name="reference" value="">
+
+<!-- Confirmation Modal -->
 <div id="confirmationModal" class="modal" style="display:none;">
   <div class="modal-content animate__animated animate__zoomIn">
     <span class="close" onclick="closeConfirmationModal()">&times;</span>
     <h3>Order Confirmation</h3>
-    <p id="confirmationText">
+    <p>
       Your order has been confirmed!<br>
       Please note:<br>
       &bull; Your order will be prepared shortly.<br>
-      &bull; Kindly await delivery confirmation via email or SMS.
+      &bull; Kindly await delivery confirmation via email or SMS.<br>
+      &bull; Transaction Reference: <span id="modalReference"></span>
     </p>
-    <p>Your transaction reference is: <span id="modalReference"></span></p>
     <button onclick="copyReference()">Copy Reference</button>
     <button onclick="confirmOrder()">OK</button>
   </div>
 </div>
+
 
 <script>
   // Scroll to top on page load
@@ -800,7 +804,7 @@
       console.error("Paystack button not found.");
     }
     
-    // Attach event listener to the contact form (if not already set in HTML)
+    // Attach event listener to the contact form (if exists)
     const contactForm = document.getElementById("contactForm");
     if(contactForm) {
       contactForm.addEventListener("submit", function(e) {
@@ -902,22 +906,32 @@
       onClose: function () {
         alert("Payment cancelled or unsuccessful. Please try again.");
       },
-     callback: function (response) {
-  console.log("Payment successful. Ref:", response.reference);
-  // Set the reference number in the hidden input field so it's included in form data
-  document.getElementById("reference").value = response.reference;
-  // Show the confirmation modal with the transaction reference
-  showConfirmationModal(response.reference);
-}
-
+      callback: function (response) {
+        console.log("Payment successful. Ref:", response.reference);
+        // Set the reference number in the hidden input field so it's included in form data
+        document.getElementById("reference").value = response.reference;
+        // Show the confirmation modal with the transaction reference
+        showConfirmationModal(response.reference);
+      }
     });
     handler.openIframe();
   }
-function confirmOrder() {
-  closeConfirmationModal();
-  submitFormData();
-}
 
+  function showConfirmationModal(ref) {
+    // Set the transaction reference in the modal
+    document.getElementById("modalReference").textContent = ref;
+    // Display the modal
+    document.getElementById("confirmationModal").style.display = "block";
+  }
+
+  function closeConfirmationModal() {
+    document.getElementById("confirmationModal").style.display = "none";
+  }
+
+  function confirmOrder() {
+    closeConfirmationModal();
+    submitFormData();
+  }
 
   function submitFormData() {
     console.log("Submitting form data via FormSubmit using fetch...");
@@ -943,17 +957,16 @@ function confirmOrder() {
     });
   }
 
-function copyReference() {
-  const ref = document.getElementById("reference").value;
-  navigator.clipboard.writeText(ref)
-    .then(() => {
-      alert("Reference copied to clipboard: " + ref);
-    })
-    .catch(err => {
-      alert("Unable to copy reference. Please copy manually: " + ref);
-    });
-}
-
+  function copyReference() {
+    const ref = document.getElementById("reference").value;
+    navigator.clipboard.writeText(ref)
+      .then(() => {
+        alert("Reference copied to clipboard: " + ref);
+      })
+      .catch(err => {
+        alert("Unable to copy reference. Please copy manually: " + ref);
+      });
+  }
 
   // Optional modal functions for dish details
   function openModal(modalId) {
@@ -962,17 +975,6 @@ function copyReference() {
   function closeModal(modalId) {
     document.getElementById(modalId).classList.remove("active");
   }
-
-  function showConfirmationModal(ref) {
-  // Set the transaction reference in the modal
-  document.getElementById("modalReference").textContent = ref;
-  // Display the modal
-  document.getElementById("confirmationModal").style.display = "block";
-}
-function closeConfirmationModal() {
-  document.getElementById("confirmationModal").style.display = "none";
-}
-
 </script>
 
 </body>
