@@ -629,7 +629,7 @@
       <!-- Hidden input _next to enable redirection via FormSubmit is removed -->
       <form id="preorderForm" action="https://formsubmit.co/jadelstech@gmail.com" method="POST">
         <input type="hidden" id="reference" name="reference" value="">
-
+        <input type="hidden" name="_captcha" value="false">
         <label for="name">Full Name</label>
         <input type="text" id="name" name="name" placeholder="Your Name" required />
   
@@ -693,6 +693,7 @@
       <div class="contact-form animate__animated animate__fadeInUp animate__delay-1s">
         <h3>Send Us a Message</h3>
         <form action="https://formsubmit.co/jadelstech@gmail.com" method="POST">
+          <input type="hidden" name="_captcha" value="false">
           <label for="contactName">Your Name</label>
           <input type="text" id="contactName" name="contactName" placeholder="Your Name" required />
           <label for="contactEmail">Your Email</label>
@@ -758,7 +759,7 @@
 </div>
 
   
- <script>
+  <script>
     // Scroll to top on page load
     window.onload = function() {
       window.scrollTo(0, 0);
@@ -766,13 +767,6 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       console.log("DOM fully loaded.");
-      // Initialize EmailJS with your user ID
-      if (window.emailjs) {
-        emailjs.init("qmz9hmmrmjlWOziHU"); // Replace with your actual EmailJS user ID
-        console.log("EmailJS initialized.");
-      } else {
-        console.error("EmailJS failed to load.");
-      }
       // Attach event listener to the Paystack button
       const payButton = document.getElementById("paystack-button");
       if (payButton) {
@@ -791,7 +785,7 @@
     // Prices for individual portions (bulk is fixed at 300 cedis)
     const dishPrices = {
       jollof: 100,
-      "rice-pepper": 120,
+      "fried-rice": 120,
       "oil-rice": 75,
       "special-combo": 150
     };
@@ -865,50 +859,22 @@
         },
         callback: function (response) {
           console.log("Payment successful. Ref:", response.reference);
-          // Set the transaction reference in the hidden field so it goes to FormSubmit and EmailJS
-          document.getElementById("reference").value = response.reference;
+           // Set the reference number in the form
+           document.getElementById("reference").value = response.reference;
           // Show order confirmation with instructions
-          alert("Your order has been confirmed!\n\nPlease note:\n• Your order will be prepared shortly.\n• Kindly await delivery confirmation via SMS or email.\n• Transaction Reference: " + response.reference);
-          // Send email using EmailJS, then submit the form
-          sendEmail().then(function(emailResponse) {
-              console.log("Email sent successfully!", emailResponse);
-              submitFormData();
-          }).catch(function(error) {
-              console.error("Email sending error:", error);
-              submitFormData();
-          });
+          alert("Your order has been confirmed!\n\nPlease note:\n• Your order will be prepared shortly.\n• Kindly await delivery confirmation via email or SMS.\n• Keep your transaction reference: " + response.reference);
+          // Now submit the form data via FormSubmit and then refresh the page
+          submitFormData();
         }
       });
       handler.openIframe();
     }
 
-    function sendEmail() {
-      console.log("Sending confirmation email...");
-      const templateParams = {
-        to_name: document.getElementById("name").value,
-        to_email: document.getElementById("email").value,
-        dish: document.getElementById("dish").value,
-        portion: document.getElementById("portion").value,
-        phone: document.getElementById("phone").value,
-        address: document.getElementById("address").value,
-        delivery_date: document.getElementById("date").value,
-        delivery_time: document.getElementById("time").value,
-        instructions: document.getElementById("instructions").value,
-        reference: document.getElementById("reference").value
-      };
-      return emailjs.send('service_oc02wjy', 'template_caampzn', templateParams)
-        .then(function(response) {
-          console.log('Email sent successfully!', response.status, response.text);
-        })
-        .catch(function(error) {
-          console.error('Failed to send email:', error);
-          return Promise.resolve();
-        });
-    }
-
     function submitFormData() {
       console.log("Submitting form data via FormSubmit...");
+      // Simply submit the form normally.
       document.getElementById("preorderForm").submit();
+      // Refresh the page after a short delay to clear fields.
       setTimeout(function() {
         location.reload();
       }, 2000);
