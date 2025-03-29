@@ -562,60 +562,61 @@
     </div>
   </section>
   
-  <!-- ========= Menu Section ========= -->
-  <section class="menu" id="menu">
-    <h2 class="section-title animate__animated animate__fadeInDown">Our Menu</h2>
-    <div class="menu-container">
-      <!-- Jollof Rice Card -->
-      <div class="menu-item animate__animated animate__zoomIn">
-        <img src="jollofrice.jpg" alt="Jollof Rice">
-        <div class="item-info">
-          <h3>Jollof Rice</h3>
-          <p>Classic, savory, and bursting with flavor.</p>
-          <p class="ingredients"><i class="fas fa-leaf"></i> Tomato, pepper, onion, herbs</p>
-          <span>100 cedis</span>
-          <br>
-          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-jollof')">View Details</a>
-        </div>
-      </div>
-      <!-- Rice & Pepper Card -->
-      <div class="menu-item animate__animated animate__zoomIn animate__delay-1s">
-        <img src="pepper.jpeg" alt="Rice & Pepper">
-        <div class="item-info">
-          <h3>Rice &amp; Pepper</h3>
-          <p>Spicy and satisfying with a kick.</p>
-          <p class="ingredients"><i class="fas fa-fire"></i> Scotch bonnet, red pepper, spices</p>
-          <span>120 cedis</span>
-          <br>
-          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-rice-pepper')">View Details</a>
-        </div>
-      </div>
-      <!-- Oil Rice Card -->
-      <div class="menu-item animate__animated animate__zoomIn animate__delay-2s">
-        <img src="oil.jpg" alt="Oil Rice">
-        <div class="item-info">
-          <h3>Oil Rice</h3>
-          <p>Aromatic and deeply satisfying.</p>
-          <p class="ingredients"><i class="fas fa-smile"></i> Palm oil, spices, ginger</p>
-          <span>75 cedis</span>
-          <br>
-          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-oil-rice')">View Details</a>
-        </div>
-      </div>
-      <!-- Special Combo Card -->
-      <div class="menu-item animate__animated animate__zoomIn animate__delay-3s">
-        <img src="combo.jpeg" alt="Special Combo">
-        <div class="item-info">
-          <h3>Special Combo</h3>
-          <p>A delightful medley for a hearty feast.</p>
-          <p class="ingredients"><i class="fas fa-utensils"></i> Selection of our top dishes</p>
-          <span>150 cedis</span>
-          <br>
-          <a href="javascript:void(0)" class="btn" onclick="openModal('modal-special-combo')">View Details</a>
-        </div>
+<!-- ========= Menu Section ========= -->
+<section class="menu" id="menu">
+  <h2 class="section-title animate__animated animate__fadeInDown">Our Menu</h2>
+  <div class="menu-container">
+    <!-- Jollof Rice Card -->
+    <div class="menu-item animate__animated animate__zoomIn">
+      <img src="jollofrice.jpg" alt="Jollof Rice">
+      <div class="item-info">
+        <h3>Jollof Rice</h3>
+        <p>Rich and savory with a vibrant tomato kick.</p>
+        <p class="ingredients"><i class="fas fa-leaf"></i> Tomato, pepper, onion, herbs</p>
+        <span>100 cedis</span>
+        <br>
+        <a href="javascript:void(0)" class="btn" onclick="openModal('modal-jollof')">View Details</a>
       </div>
     </div>
-  </section>
+    <!-- Fried Rice Card -->
+    <div class="menu-item animate__animated animate__zoomIn animate__delay-1s">
+      <img src="friedrice.jpeg" alt="Fried Rice">
+      <div class="item-info">
+        <h3>Fried Rice</h3>
+        <p>Colorful, stir-fried rice with a perfect hint of spice.</p>
+        <p class="ingredients"><i class="fas fa-fire"></i> Rice, veggies, curry, chicken</p>
+        <span>120 cedis</span>
+        <br>
+        <a href="javascript:void(0)" class="btn" onclick="openModal('modal-friedrice')">View Details</a>
+      </div>
+    </div>
+    <!-- Oil Rice Card -->
+    <div class="menu-item animate__animated animate__zoomIn animate__delay-2s">
+      <img src="oil.jpg" alt="Oil Rice">
+      <div class="item-info">
+        <h3>Oil Rice</h3>
+        <p>Aromatic rice with a rich oil infusion.</p>
+        <p class="ingredients"><i class="fas fa-smile"></i> Oil, ginger, spices</p>
+        <span>75 cedis</span>
+        <br>
+        <a href="javascript:void(0)" class="btn" onclick="openModal('modal-oil-rice')">View Details</a>
+      </div>
+    </div>
+    <!-- Special Combo Card -->
+    <div class="menu-item animate__animated animate__zoomIn animate__delay-3s">
+      <img src="combofood.jpg" alt="Special Combo">
+      <div class="item-info">
+        <h3>Special Combo</h3>
+        <p>A mix of our signature dishes for the ultimate feast.</p>
+        <p class="ingredients"><i class="fas fa-utensils"></i>Selection of our top dishes</p>
+        <span>150 cedis</span>
+        <br>
+        <a href="javascript:void(0)" class="btn" onclick="openModal('modal-special-combo')">View Details</a>
+      </div>
+    </div>
+  </div>
+</section>
+
   
   <!-- ========= Order Section ========= -->
   <section class="order-section" id="order">
@@ -718,43 +719,46 @@
     </div>
   </footer>
   
-  <!-- ========= (Optional) Modals for Dish Details ========= -->
-  <!-- Jollof Rice Modal -->
-  <div class="modal" id="modal-jollof">
-    <div class="modal-content animate__animated animate__zoomIn">
-      <span class="close" onclick="closeModal('modal-jollof')">&times;</span>
-      <h3>Jollof Rice Details</h3>
-      <p>Our signature Jollof Rice is a rich blend of parboiled rice, fresh tomatoes, and a mix of spices. Slow‑cooked to perfection, it’s served with your choice of protein, crispy fried plantains, and a refreshing salad.</p>
-      <p><strong>Ingredients:</strong> Rice, tomatoes, red bell peppers, onions, garlic, thyme, bay leaves, and chicken or fish.</p>
-    </div>
+<!-- Jollof Rice Modal -->
+<div class="modal" id="modal-jollof">
+  <div class="modal-content animate__animated animate__zoomIn">
+    <span class="close" onclick="closeModal('modal-jollof')">&times;</span>
+    <h3>Jollof Rice Details</h3>
+    <p>Experience our signature Jollof Rice: parboiled rice simmered in a rich tomato sauce with peppers and spices, served with your choice of protein and crispy fried plantains.</p>
+    <p><strong>Ingredients:</strong> Rice, tomatoes, bell peppers, onions, garlic, thyme, bay leaves, and chicken or fish.</p>
   </div>
-  <!-- Rice & Pepper Modal -->
-  <div class="modal" id="modal-rice-pepper">
-    <div class="modal-content animate__animated animate__zoomIn">
-      <span class="close" onclick="closeModal('modal-rice-pepper')">&times;</span>
-      <h3>Rice &amp; Pepper Details</h3>
-      <p>This dish features perfectly cooked rice tossed with a vibrant blend of peppers and spices. Fiery yet balanced, it's a must‑try for spice lovers.</p>
-      <p><strong>Ingredients:</strong> Rice, Scotch bonnet peppers, red bell peppers, onions, garlic, and traditional spices.</p>
-    </div>
+</div>
+
+<!-- Fried Rice Modal -->
+<div class="modal" id="modal-fried-rice">
+  <div class="modal-content animate__animated animate__zoomIn">
+    <span class="close" onclick="closeModal('modal-fried-rice')">&times;</span>
+    <h3>Fried Rice Details</h3>
+    <p>Savor our Fried Rice: perfectly stir‑fried rice with a medley of vegetables and a hint of spice for a balanced flavor.</p>
+    <p><strong>Ingredients:</strong> Rice, mixed vegetables, garlic, onions, and a dash of curry powder.</p>
   </div>
-  <!-- Oil Rice Modal -->
-  <div class="modal" id="modal-oil-rice">
-    <div class="modal-content animate__animated animate__zoomIn">
-      <span class="close" onclick="closeModal('modal-oil-rice')">&times;</span>
-      <h3>Oil Rice Details</h3>
-      <p>Oil Rice is a comforting dish featuring rice simmered in palm oil with aromatic spices. It’s a soulful meal that warms you from within.</p>
-      <p><strong>Ingredients:</strong> Rice, palm oil, onions, garlic, and a hint of ginger.</p>
-    </div>
+</div>
+
+<!-- Oil Rice Modal -->
+<div class="modal" id="modal-oil-rice">
+  <div class="modal-content animate__animated animate__zoomIn">
+    <span class="close" onclick="closeModal('modal-oil-rice')">&times;</span>
+    <h3>Oil Rice Details</h3>
+    <p>Enjoy a comforting bowl of Oil Rice: rice infused with rich oil and aromatic spices for a warm, savory taste.</p>
+    <p><strong>Ingredients:</strong> Rice, oil, onions, garlic, and a hint of ginger.</p>
   </div>
-  <!-- Special Combo Modal -->
-  <div class="modal" id="modal-special-combo">
-    <div class="modal-content animate__animated animate__zoomIn">
-      <span class="close" onclick="closeModal('modal-special-combo')">&times;</span>
-      <h3>Special Combo Details</h3>
-      <p>Our Special Combo offers a curated selection of our finest dishes. Enjoy a medley of flavors in one ultimate feast.</p>
-      <p><strong>Ingredients:</strong> A combination of our best ingredients, perfectly balanced for a delightful taste.</p>
-    </div>
+</div>
+
+<!-- Special Combo Modal -->
+<div class="modal" id="modal-special-combo">
+  <div class="modal-content animate__animated animate__zoomIn">
+    <span class="close" onclick="closeModal('modal-special-combo')">&times;</span>
+    <h3>Special Combo Details</h3>
+    <p>Indulge in our Special Combo: a curated medley of our top dishes for a complete, satisfying feast.</p>
+    <p><strong>Ingredients:</strong> A selection of our signature ingredients for a balanced, flavorful meal.</p>
   </div>
+</div>
+
   
   <script>
     // Scroll to top on page load
