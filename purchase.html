@@ -628,6 +628,8 @@
       </div>
       <!-- Hidden input _next to enable redirection via FormSubmit is removed -->
       <form id="preorderForm" action="https://formsubmit.co/jadelstech@gmail.com" method="POST">
+        <input type="hidden" id="reference" name="reference" value="">
+
         <label for="name">Full Name</label>
         <input type="text" id="name" name="name" placeholder="Your Name" required />
   
@@ -644,7 +646,7 @@
         <select id="dish" name="dish" required>
           <option value="">-- Choose a Dish --</option>
           <option value="jollof">Jollof Rice</option>
-          <option value="rice-pepper">Rice &amp; Pepper</option>
+          <option value="fried-rice">Fried Rice</option>
           <option value="oil-rice">Oil Rice</option>
           <option value="special-combo">Special Combo</option>
         </select>
@@ -782,7 +784,7 @@
     // Prices for individual portions (bulk is fixed at 300 cedis)
     const dishPrices = {
       jollof: 100,
-      "rice-pepper": 120,
+      "fried-rice": 120,
       "oil-rice": 75,
       "special-combo": 150
     };
@@ -856,6 +858,8 @@
         },
         callback: function (response) {
           console.log("Payment successful. Ref:", response.reference);
+           // Set the reference number in the form
+           document.getElementById("reference").value = response.reference;
           // Show order confirmation with instructions
           alert("Your order has been confirmed!\n\nPlease note:\n• Your order will be prepared shortly.\n• Kindly await delivery confirmation via email or SMS.\n• Keep your transaction reference: " + response.reference);
           // Now submit the form data via FormSubmit and then refresh the page
