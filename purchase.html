@@ -678,11 +678,13 @@
       
 
       </form>
-      <div id="confirmationMessage" style="display:none; margin-top:1em; color:green; font-weight:bold;"></div>
+    <input type="hidden" id="reference" name="reference" value="">
+<div id="confirmationMessage" style="display:none; margin-top:1em; color:green; font-weight:bold;"></div>
 <div id="copyRefContainer" style="display:none; margin-top:1em;">
   <p>Your transaction reference is: <span id="transactionRef"></span></p>
   <button onclick="copyReference()">Copy Reference</button>
 </div>
+
 
 </div>
 
@@ -769,194 +771,191 @@
 </div>
 
   
-  <script>
-    // Scroll to top on page load
-    window.onload = function() {
-      window.scrollTo(0, 0);
-    };
+<script>
+  // Scroll to top on page load
+  window.onload = function() {
+    window.scrollTo(0, 0);
+  };
 
-    document.addEventListener("DOMContentLoaded", function () {
-      console.log("DOM fully loaded.");
-      // Attach event listener to the Paystack button
-      const payButton = document.getElementById("paystack-button");
-      if (payButton) {
-        payButton.addEventListener("click", function (e) {
-          e.preventDefault();
-          console.log("Paystack button clicked.");
-          if (validateForm()) {
-            payWithPaystack();
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM fully loaded.");
+    // Attach event listener to the Paystack button
+    const payButton = document.getElementById("paystack-button");
+    if (payButton) {
+      payButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        console.log("Paystack button clicked.");
+        if (validateForm()) {
+          payWithPaystack();
+        }
+      });
+    } else {
+      console.error("Paystack button not found.");
+    }
+    
+    // Attach event listener to the contact form (if not already set in HTML)
+    const contactForm = document.getElementById("contactForm");
+    if(contactForm) {
+      contactForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        })
+        .then(response => {
+          if (response.ok) {
+            alert("Thanks! Your message was sent successfully. We'll get back to you ASAP!");
+            location.reload();
+          } else {
+            alert("Oops! There was a problem sending your message.");
           }
+        })
+        .catch(error => {
+          alert("Oops! There was a problem sending your message.");
         });
-      } else {
-        console.error("Paystack button not found.");
-      }
-    });
+      });
+    }
+  });
 
-    // Prices for individual portions (bulk is fixed at 300 cedis)
-    const dishPrices = {
-      jollof: 100,
-      "fried-rice": 120,
-      "oil-rice": 75,
-      "special-combo": 150
-    };
+  // Prices for individual portions (bulk is fixed at 300 cedis)
+  const dishPrices = {
+    jollof: 100,
+    "fried-rice": 120,
+    "oil-rice": 75,
+    "special-combo": 150
+  };
 
-    // Basic form validation
-    function validateForm() {
-      const name = document.getElementById("name");
-      const email = document.getElementById("email");
-      const phone = document.getElementById("phone");
-      const address = document.getElementById("address");
-      const dish = document.getElementById("dish");
-      const portion = document.getElementById("portion");
-      const date = document.getElementById("date");
-      const time = document.getElementById("time");
+  // Basic form validation for the preorder form
+  function validateForm() {
+    const name = document.getElementById("name");
+    const email = document.getElementById("email");
+    const phone = document.getElementById("phone");
+    const address = document.getElementById("address");
+    const dish = document.getElementById("dish");
+    const portion = document.getElementById("portion");
+    const date = document.getElementById("date");
+    const time = document.getElementById("time");
 
-      let isValid = true;
-      let errorMessages = [];
+    let isValid = true;
+    let errorMessages = [];
 
-      if (!/^\S+\s+\S+/.test(name.value.trim())) {
-        errorMessages.push("Please enter your FULL NAME (first and last).");
-        isValid = false;
-      }
-
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-        errorMessages.push("Please enter a valid email address.");
-        isValid = false;
-      }
-
-      if (!/^\d{10}$/.test(phone.value.trim())) {
-        errorMessages.push("Please enter a valid 10-digit phone number.");
-        isValid = false;
-      }
-
-      if (address.value.trim() === "") {
-        errorMessages.push("Please enter your residential address.");
-        isValid = false;
-      }
-
-      if (!dish.value) {
-        errorMessages.push("Please select a dish.");
-        isValid = false;
-      }
-      
-      if (!portion.value) {
-        errorMessages.push("Please select a portion type.");
-        isValid = false;
-      }
-
-      if (!isValid) {
-        alert("⚠️ Please fix the following errors before proceeding:\n\n" + errorMessages.join("\n"));
-      }
-      return isValid;
+    if (!/^\S+\s+\S+/.test(name.value.trim())) {
+      errorMessages.push("Please enter your FULL NAME (first and last).");
+      isValid = false;
     }
 
-    function payWithPaystack() {
-      console.log("Initiating Paystack payment...");
-      const dish = document.getElementById("dish").value;
-      const portion = document.getElementById("portion").value;
-      let price = dishPrices[dish] || 0;
-      if (portion === "bulk") price = 300;
-      const amount = price * 100; // Convert to pesewas
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+      errorMessages.push("Please enter a valid email address.");
+      isValid = false;
+    }
 
-      const handler = PaystackPop.setup({
-        key: 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa', // Replace with your Paystack test key
-        email: document.getElementById("email").value,
-        amount: amount,
-        currency: "GHS",
-        ref: "ORDER_" + Math.floor(Math.random() * 1000000000),
-        onClose: function () {
-          alert("Payment cancelled or unsuccessful. Please try again.");
-        },
+    if (!/^\d{10}$/.test(phone.value.trim())) {
+      errorMessages.push("Please enter a valid 10-digit phone number.");
+      isValid = false;
+    }
+
+    if (address.value.trim() === "") {
+      errorMessages.push("Please enter your residential address.");
+      isValid = false;
+    }
+
+    if (!dish.value) {
+      errorMessages.push("Please select a dish.");
+      isValid = false;
+    }
+    
+    if (!portion.value) {
+      errorMessages.push("Please select a portion type.");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      alert("⚠️ Please fix the following errors before proceeding:\n\n" + errorMessages.join("\n"));
+    }
+    return isValid;
+  }
+
+  function payWithPaystack() {
+    console.log("Initiating Paystack payment...");
+    const dish = document.getElementById("dish").value;
+    const portion = document.getElementById("portion").value;
+    let price = dishPrices[dish] || 0;
+    if (portion === "bulk") price = 300;
+    const amount = price * 100; // Convert to pesewas
+
+    const handler = PaystackPop.setup({
+      key: 'pk_test_297586e51710e83d3c159bfe71ff45c7e23411fa', // Replace with your Paystack test key
+      email: document.getElementById("email").value,
+      amount: amount,
+      currency: "GHS",
+      ref: "ORDER_" + Math.floor(Math.random() * 1000000000),
+      onClose: function () {
+        alert("Payment cancelled or unsuccessful. Please try again.");
+      },
       callback: function (response) {
-  console.log("Payment successful. Ref:", response.reference);
-  // Set the reference number in the form
-  document.getElementById("reference").value = response.reference;
-  // Update and show the confirmation message
-  const confMsg = document.getElementById("confirmationMessage");
-  confMsg.innerHTML = "Your order has been confirmed!<br>Please note:<br>&bull; Your order will be prepared shortly.<br>&bull; Kindly await delivery confirmation via email or SMS.<br>&bull; Transaction Reference: " + response.reference;
-  confMsg.style.display = "block";
-  // Update and show the copy reference container
-  document.getElementById("transactionRef").textContent = response.reference;
-  document.getElementById("copyRefContainer").style.display = "block";
-  // Now submit the form data via FormSubmit after a delay
-  setTimeout(submitFormData, 3000);
-}
-
-   function copyReference() {
-  const ref = document.getElementById("reference").value;
-  navigator.clipboard.writeText(ref)
-    .then(() => {
-      alert("Reference copied to clipboard: " + ref);
-    })
-    .catch(err => {
-      alert("Unable to copy reference. Please copy manually: " + ref);
+        console.log("Payment successful. Ref:", response.reference);
+        // Set the reference number in the form
+        document.getElementById("reference").value = response.reference;
+        // Update and show the confirmation message
+        const confMsg = document.getElementById("confirmationMessage");
+        confMsg.innerHTML = "Your order has been confirmed!<br>Please note:<br>&bull; Your order will be prepared shortly.<br>&bull; Kindly await delivery confirmation via email or SMS.<br>&bull; Transaction Reference: " + response.reference;
+        confMsg.style.display = "block";
+        // Update and show the copy reference container
+        document.getElementById("transactionRef").textContent = response.reference;
+        document.getElementById("copyRefContainer").style.display = "block";
+        // Now submit the form data via FormSubmit after a delay (3 seconds)
+        setTimeout(submitFormData, 3000);
+      }
     });
-}
+    handler.openIframe();
+  }
 
-
-document.getElementById("preorderForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  const form = this;
-  const formData = new FormData(form);
-  fetch(form.action, {
-    method: "POST",
-    body: formData,
-    headers: { 'Accept': 'application/json' }
-  }) 
-  });
-    function submitFormData() {
-  console.log("Submitting form data via FormSubmit using fetch...");
-  const form = document.getElementById("preorderForm");
-  const formData = new FormData(form);
-  fetch(form.action, {
-    method: "POST",
-    body: formData,
-    headers: { 'Accept': 'application/json' }
-  })
-  .then(response => {
-    if (response.ok) {
-      console.log("Form submitted successfully.");
-      // Refresh the page to clear fields
-      location.reload();
-    } else {
+  function submitFormData() {
+    console.log("Submitting form data via FormSubmit using fetch...");
+    const form = document.getElementById("preorderForm");
+    const formData = new FormData(form);
+    fetch(form.action, {
+      method: "POST",
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log("Form submitted successfully.");
+        // Refresh the page to clear fields
+        location.reload();
+      } else {
+        alert("There was an error processing your order. Please try again.");
+      }
+    })
+    .catch(error => {
+      console.error("Form submission error:", error);
       alert("There was an error processing your order. Please try again.");
-    }
-  })
-  .catch(error => {
-    console.error("Form submission error:", error);
-    alert("There was an error processing your order. Please try again.");
-  });
-}
+    });
+  }
 
- document.getElementById("contactForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  const form = this;
-  const formData = new FormData(form);
-  fetch(form.action, {
-    method: "POST",
-    body: formData,
-    headers: { 'Accept': 'application/json' }
-  })
-  .then(response => {
-    if (response.ok) {
-      alert("Thanks! Your message was sent successfully. We'll get back to you ASAP!");
-      location.reload();
-    } else {
-      alert("Oops! There was a problem sending your message.");
-    }
-  })
-  .catch(error => {
-    alert("Oops! There was a problem sending your message.");
-  });
-});
+  function copyReference() {
+    const ref = document.getElementById("reference").value;
+    navigator.clipboard.writeText(ref)
+      .then(() => {
+        alert("Reference copied to clipboard: " + ref);
+      })
+      .catch(err => {
+        alert("Unable to copy reference. Please copy manually: " + ref);
+      });
+  }
 
-    // Optional modal functions for dish details
-    function openModal(modalId) {
-      document.getElementById(modalId).classList.add("active");
-    }
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove("active");
-    }
-  </script>
+  // Optional modal functions for dish details
+  function openModal(modalId) {
+    document.getElementById(modalId).classList.add("active");
+  }
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove("active");
+  }
+</script>
+
 </body>
 </html>
