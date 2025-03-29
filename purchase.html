@@ -921,7 +921,11 @@
     // Set the transaction reference in the modal
     document.getElementById("modalReference").textContent = ref;
     // Display the modal
-    document.getElementById("confirmationModal").style.display = "block";
+    
+    const modal = document.getElementById("confirmationModal");
+  modal.style.display = "block";
+  modal.style.visibility = "visible";
+  modal.style.opacity = "1";
   }
 
   function closeConfirmationModal() {
