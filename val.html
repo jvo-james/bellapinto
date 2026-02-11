@@ -353,27 +353,25 @@
     <small>Made with <i class="fa-solid fa-heart" style="color:var(--accent)"></i> — SweetLove Gifts</small>
   </footer>
 </body>
-<script>
 
-
+  <script>
 (() => {
   // ---------- Configuration ----------
   const config = {
     prices: { "Full Package": 350, "Brownies": 300, "Chocolate": 250 },
     paystackPublicKey: 'REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY', // <-- Put your Paystack public key here
-    deliveryFee: 15,
-    currencySymbol: 'GH₵'
+    currencySymbol: 'GH₵',
+    processingRate: 0.0295 // 2.95%
   };
 
   // ---------- Helpers ----------
-  const \$ = (s) => document.querySelector(s);
+  const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
   const el = (id) => document.getElementById(id);
 
   const formatCurrency = (n) => `${config.currencySymbol} ${Number(n).toFixed(2)}`;
 
   function showToast(message, opts = {}) {
-    // Simple accessible toast for short messages
     let container = document.getElementById('slg-toast-container');
     if (!container) {
       container = document.createElement('div');
@@ -395,13 +393,13 @@
     node.style.boxShadow = '0 8px 30px rgba(0,0,0,0.4)';
     node.style.fontWeight = '700';
     container.appendChild(node);
-    setTimeout(() => node.style.opacity = '0.85', 10);
+    setTimeout(() => node.style.opacity = '0.95', 10);
     setTimeout(() => { node.style.transition = 'opacity 400ms'; node.style.opacity = '0'; }, opts.duration || 3600);
     setTimeout(() => node.remove(), (opts.duration || 3600) + 600);
   }
 
   function escapeHtml(s = '') {
-    return String(s).replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   // ---------- State ----------
@@ -422,30 +420,49 @@
   const resetBtn = el('resetBtn');
   const modalRoot = el('modalRoot');
   const contactBtn = el('contactBtn');
+  const addressEl = el('address');
+  const methodDeliveryEl = el('method-delivery');
+  const methodPickupEl = el('method-pickup');
 
   // ---------- Initialization ----------
   function init() {
-    // wire package buttons
+    // Save original innerHTML for each package button so we can restore it when deselected
+    $$('.select-package').forEach(btn => {
+      const name = btn.dataset.name || (btn.closest('.product-card') && btn.closest('.product-card').dataset.sku) || '';
+      if (name === 'Brownies') {
+        // Brownies original icon per user's request
+        btn.dataset.origHtml = `<i class="fa-solid fa-cookie-bite" aria-hidden="true"></i> Choose`;
+      } else {
+        btn.dataset.origHtml = btn.innerHTML.trim();
+      }
+      btn.setAttribute('aria-pressed', 'false');
+    });
+
+    // wire package buttons (toggle/select)
     $$('.select-package').forEach(btn => {
       btn.addEventListener('click', () => {
-        const name = btn.dataset.name || btn.closest('.product-card')?.dataset?.sku || null;
-        const price = Number(btn.dataset.price || btn.closest('.product-card')?.dataset?.price || 0);
+        const name = btn.dataset.name || (btn.closest('.product-card') && btn.closest('.product-card').dataset.sku) || null;
+        const price = Number(btn.dataset.price || (btn.closest('.product-card') && btn.closest('.product-card').dataset.price) || 0);
+        const sku = (btn.closest('.product-card') && btn.closest('.product-card').dataset.sku) || (name && name.toLowerCase()) || null;
         if (!name) return;
-        setSelectedPackage({ name, price, sku: (btn.closest('.product-card')?.dataset?.sku || name).toLowerCase() });
 
-        // update ARIA pressed and visual selection
-        $$('.select-package').forEach(b => {
-          b.setAttribute('aria-pressed', 'false');
-          b.classList.remove('selected');
-        });
-        btn.setAttribute('aria-pressed', 'true');
-        btn.classList.add('selected');
+        const alreadySelected = (state.sku && sku && state.sku === sku);
+
+        if (alreadySelected) {
+          // Deselect current
+          deselectCurrentPackage();
+          showToast(`${name} removed from selection`);
+        } else {
+          // Select this package (and deselect any previous)
+          selectPackageButton(btn, { name, price, sku });
+        }
       });
     });
 
-    // qty & delivery method update
+    // qty update
     qtyEl.addEventListener('input', updateSummary);
-    $$('input[name="method"]').forEach(r => r.addEventListener('change', updateSummary));
+    // delivery method change handlers
+    $$('input[name="method"]').forEach(r => r.addEventListener('change', () => { handleMethodChange(); updateSummary(); }));
 
     // reset
     resetBtn.addEventListener('click', doReset);
@@ -460,10 +477,13 @@
       else showToast('Add your phone number in the form first to call.');
     });
 
-    // initial compute
+    // set initial method behavior
+    handleMethodChange();
+
+    // initial summary compute
     updateSummary();
 
-    // warn if Paystack or jsPDF are not loaded
+    // warn about missing libs
     if (typeof PaystackPop === 'undefined') {
       console.warn('Paystack inline script not found. Payments will not work until you add: https://js.paystack.co/v1/inline.js');
       showToast('Paystack not loaded — add Paystack script in <head>.', { duration: 6000 });
@@ -474,43 +494,161 @@
     }
   }
 
-  function setSelectedPackage({ name, price, sku }) {
+  // ---------- Selection helpers ----------
+  function selectPackageButton(btn, { name, price, sku }) {
+    // Deselect previous if exists
+    if (state.sku) {
+      const prevBtn = $(`.select-package[aria-pressed="true"]`);
+      if (prevBtn && prevBtn !== btn) restoreButtonToOriginal(prevBtn);
+    }
+
+    // Update state
     state.name = name;
     state.price = Number(price || 0);
-    state.sku = sku || name.toLowerCase();
-    packageSelectEl.value = `${name}`;
+    state.sku = sku;
+
+    // Update button: show check + Selected
+    btn.dataset.prevInner = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-check" aria-hidden="true"></i> Selected`;
+    btn.classList.add('selected');
+    btn.setAttribute('aria-pressed', 'true');
+
+    // Update the selected package input
+    packageSelectEl.value = name;
     updateSummary();
     showToast(`${name} selected — ${formatCurrency(state.price)}`);
   }
 
+  function restoreButtonToOriginal(btn) {
+    const orig = btn.dataset.origHtml || btn.dataset.prevInner || btn.innerHTML;
+    btn.innerHTML = orig;
+    btn.classList.remove('selected');
+    btn.setAttribute('aria-pressed', 'false');
+  }
+
+  function deselectCurrentPackage() {
+    const prevBtn = $(`.select-package[aria-pressed="true"]`) || $$('.select-package').find(b => b.classList.contains('selected'));
+    if (prevBtn) restoreButtonToOriginal(prevBtn);
+
+    state.name = null;
+    state.price = 0;
+    state.sku = null;
+    packageSelectEl.value = 'No package chosen';
+    updateSummary();
+  }
+
+  // ---------- Address & delivery behavior (Task 2 preserved) ----------
+  function handleMethodChange() {
+    const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
+    if (method === 'pickup') {
+      // Autofill pickup address, make read-only
+      addressEl.value = 'UPSA hostel';
+      addressEl.setAttribute('readonly', 'true');
+      addressEl.setAttribute('aria-readonly', 'true');
+      addressEl.placeholder = '';
+      showSmallNote('Pickup selected — pickup address set to UPSA hostel.');
+    } else {
+      // Delivery selected: enable address and prompt
+      if (addressEl.value.trim() === 'UPSA hostel') addressEl.value = '';
+      addressEl.removeAttribute('readonly');
+      addressEl.removeAttribute('aria-readonly');
+      addressEl.placeholder = "Enter delivery address — delivery charges will be arranged after payment";
+      showSmallNote('Delivery selected — delivery charges will be communicated after payment.');
+    }
+  }
+
+  function showSmallNote(text) {
+    let note = document.querySelector('.delivery-note');
+    if (!note) {
+      note = document.createElement('div');
+      note.className = 'delivery-note';
+      note.style.fontSize = '12px';
+      note.style.color = '#6b6b73';
+      note.style.marginTop = '8px';
+      note.style.opacity = '0.95';
+      const summary = document.querySelector('.summary');
+      if (summary) summary.appendChild(note);
+    }
+    note.textContent = text;
+  }
+
+  // ---------- Form helpers ----------
   function doReset() {
     state.name = null; state.price = 0; state.sku = null;
     packageSelectEl.value = 'No package chosen';
     chocoOptionEl.value = '';
     qtyEl.value = 1;
-    el('name').value = ''; el('phone').value = ''; el('address').value = '';
-    $$('.select-package').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
+    el('name').value = ''; el('phone').value = ''; addressEl.value = '';
+    $$('.select-package').forEach(b => { restoreButtonToOriginal(b); b.setAttribute('aria-pressed', 'false'); });
+    // default to delivery (matches HTML) and update
+    methodDeliveryEl.checked = true;
+    handleMethodChange();
     updateSummary();
     showToast('Form reset');
   }
 
+  function ensureProcessingRowExists() {
+    // create processing fee row (id=processingFeeRow) between delivery row and hr if not exists
+    const summary = document.querySelector('.summary');
+    if (!summary) return;
+    if (!document.getElementById('processingFeeRow')) {
+      // create wrapper
+      const row = document.createElement('div');
+      row.id = 'processingFeeRow';
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.marginTop = '6px';
+      row.innerHTML = `<div>Processing fee</div><div id="processingFee">${formatCurrency(0)}</div>`;
+      // find hr and insert row before hr
+      const hr = summary.querySelector('hr');
+      if (hr) summary.insertBefore(row, hr);
+      else summary.appendChild(row);
+    }
+  }
+
   function updateSummary() {
+    ensureProcessingRowExists();
+
     const q = Math.max(1, parseInt(qtyEl.value || 1));
     const sub = (state.price || 0) * q;
     const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
-    const delivery = method === 'pickup' ? 0 : (sub > 0 ? config.deliveryFee : 0);
+
+    let deliveryLabel;
+    if (method === 'pickup') {
+      deliveryLabel = formatCurrency(0);
+    } else {
+      deliveryLabel = 'To be arranged';
+    }
+
+    // processing fee = 2.95% of subtotal (rounded to 2 decimals)
+    const processingFeeRaw = sub * config.processingRate;
+    const processingFee = Math.round(processingFeeRaw * 100) / 100;
+
+    const totalCharged = Math.round((sub + processingFee) * 100) / 100;
+
     subtotalEl.textContent = formatCurrency(sub);
-    deliveryCostEl.textContent = formatCurrency(delivery);
-    totalEl.textContent = formatCurrency(sub + delivery);
+    deliveryCostEl.textContent = deliveryLabel;
+
+    // set processing fee in DOM
+    const feeEl = document.getElementById('processingFee');
+    if (feeEl) feeEl.textContent = formatCurrency(processingFee);
+
+    // total displayed is totalCharged (processing included)
+    totalEl.textContent = formatCurrency(totalCharged);
+
+    // store on state for later use in payment
+    state._calc = { q, sub, processingFee, totalCharged, method };
   }
 
-  // ---------- Payment ----------
+  // ---------- Payment flow (Task 3: processing fee included) ----------
   function startPaystackPayment() {
-    // basic validation
+    // validation
     if (!state.name) { alert('Please choose a package first.'); return; }
     const buyerName = (el('name')?.value || '').trim();
     const phone = (el('phone')?.value || '').trim();
-    const address = (el('address')?.value || '').trim() || 'Pickup';
+    let address = (addressEl?.value || '').trim();
+    const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
+
     if (!buyerName) { alert('Please enter a name.'); el('name').focus(); return; }
     if (!phone) { alert('Please enter a phone number.'); el('phone').focus(); return; }
     if (state.name === 'Chocolate' && (!chocoOptionEl.value || chocoOptionEl.value === '')) {
@@ -519,14 +657,21 @@
       return;
     }
 
-    // compute amounts
-    const q = Math.max(1, parseInt(qtyEl.value || 1));
-    const sub = (state.price || 0) * q;
-    const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
-    const delivery = method === 'pickup' ? 0 : (sub > 0 ? config.deliveryFee : 0);
-    const total = +(sub + delivery);
+    // enforce address rules
+    if (method === 'pickup') {
+      address = 'UPSA hostel';
+    } else {
+      if (!address) { alert('Please enter your delivery address. Delivery charges will be arranged after payment.'); addressEl.focus(); return; }
+    }
 
-    // ensure Paystack is available and public key set
+    // Ensure summary calculations up-to-date
+    updateSummary();
+    const calc = state._calc || {};
+    const sub = calc.sub || 0;
+    const processingFee = calc.processingFee || 0;
+    const totalToCharge = calc.totalCharged || sub + processingFee;
+
+    // verify Paystack loaded and key configured
     if (typeof PaystackPop === 'undefined') {
       alert('Payment provider not loaded. Make sure you included the Paystack inline script in the page head.');
       return;
@@ -537,16 +682,18 @@
     }
 
     // Paystack expects amount in the smallest currency unit (pesewas). Multiply by 100.
-    const amountInSmallest = Math.round(total * 100);
+    const amountInSmallest = Math.round(totalToCharge * 100);
 
     // Build metadata
     const metadata = {
       custom_fields: [
         { display_name: 'Phone', variable_name: 'phone', value: phone },
         { display_name: 'Package', variable_name: 'package', value: state.name },
-        { display_name: 'Quantity', variable_name: 'quantity', value: q },
+        { display_name: 'Quantity', variable_name: 'quantity', value: calc.q || 1 },
         { display_name: 'Flavor', variable_name: 'flavor', value: (state.name === 'Chocolate' ? chocoOptionEl.value : 'N/A') },
-        { display_name: 'Address', variable_name: 'address', value: address }
+        { display_name: 'Address', variable_name: 'address', value: address },
+        { display_name: 'ProcessingFee', variable_name: 'processing_fee', value: processingFee },
+        { display_name: 'DeliveryNote', variable_name: 'delivery_note', value: method === 'delivery' ? 'Delivery charges to be communicated after payment' : 'Pickup at UPSA hostel' }
       ]
     };
 
@@ -564,7 +711,7 @@
         showToast('Payment window closed');
       },
       callback: function(response) {
-        // response.reference contains ref. In production, verify this on your server immediately.
+        // Prepare receipt data. include processingFee and totalCharged
         const receiptData = {
           orderId: uniqueRef,
           payRef: response.reference || uniqueRef,
@@ -572,23 +719,23 @@
           phone,
           address,
           method,
-          q,
+          q: calc.q || 1,
           sub,
-          delivery,
-          total,
+          processingFee,
+          deliveryLabel: (method === 'pickup') ? 'Pickup: UPSA hostel' : 'To be arranged (we will contact you)',
+          totalCharged: Math.round((sub + processingFee) * 100) / 100,
           chosenChocolate: chocoOptionEl.value || ''
         };
         showSuccessModal(receiptData);
-        showToast('Payment successful — receipt ready');
+        showToast('Payment successful — receipt ready. Delivery charges will be arranged after payment if applicable.');
       }
     });
 
     handler.openIframe();
   }
 
-  // ---------- Modal & Receipt ----------
+  // ---------- Modal & Receipt (Task 3 aware) ----------
   function showSuccessModal(data) {
-    // Build modal DOM
     modalRoot.innerHTML = `
       <div class="modal-backdrop" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9998">
         <div class="modal" role="dialog" aria-modal="true" style="width:780px;max-width:96%;background:linear-gradient(180deg,#0f0c12,#0b0810);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 50px rgba(0,0,0,0.7);color:#fff">
@@ -617,8 +764,9 @@
             <div>
               <h4 style="margin:0 0 8px 0">Payment</h4>
               <div>Subtotal: ${formatCurrency(data.sub)}</div>
-              <div>Delivery: ${formatCurrency(data.delivery)}</div>
-              <div style="margin-top:8px;font-weight:700">Total paid: ${formatCurrency(data.total)}</div>
+              <div>Processing fee: ${formatCurrency(data.processingFee)}</div>
+              <div>Delivery: <strong>${escapeHtml(data.deliveryLabel)}</strong></div>
+              <div style="margin-top:8px;font-weight:700">Total charged: ${formatCurrency(data.totalCharged)}</div>
               <div style="margin-top:12px;font-size:13px;color:rgba(255,255,255,0.65)">Payment ref: <code style="background:transparent;border-radius:6px;padding:4px 6px;color:var(--accent)">${escapeHtml(data.payRef)}</code></div>
             </div>
           </div>
@@ -633,6 +781,7 @@
         </div>
       </div>
     `;
+
     modalRoot.style.display = 'block';
 
     // Hook up buttons
@@ -658,8 +807,11 @@
       `Address: ${data.address}`,
       '',
       `Subtotal: ${formatCurrency(data.sub)}`,
-      `Delivery: ${formatCurrency(data.delivery)}`,
-      `Total paid: ${formatCurrency(data.total)}`,
+      `Processing fee: ${formatCurrency(data.processingFee)}`,
+      `Delivery: ${data.deliveryLabel}`,
+      `Total charged: ${formatCurrency(data.totalCharged)}`,
+      '',
+      'Note: Delivery charges (if any) will be communicated to you after payment.',
       '',
       'Thank you for choosing SweetLove Gifts!',
       'Contact us if you have any questions.'
@@ -678,7 +830,6 @@
   function emailReceipt(data) {
     const subject = encodeURIComponent(`Your SweetLove Gifts receipt - ${data.orderId}`);
     const body = encodeURIComponent(receiptText(data));
-    // opens user's email client
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }
 
@@ -695,6 +846,7 @@
             pre{font-family:monospace;white-space:pre-wrap}
             .header{display:flex;justify-content:space-between;align-items:center}
             .brand{font-weight:700;color:#d6336c}
+            .note{font-size:12px;color:#555;margin-top:12px}
           </style>
         </head>
         <body>
@@ -713,7 +865,6 @@
     w.document.write(html);
     w.document.close();
     w.focus();
-    // delay print slightly to allow fonts to render
     setTimeout(() => { w.print(); }, 300);
   }
 
@@ -741,12 +892,13 @@
     doc.text(`Address: ${data.address}`, left, y); y += 22;
 
     doc.text(`Subtotal: ${formatCurrency(data.sub)}`, left, y); y += 16;
-    doc.text(`Delivery: ${formatCurrency(data.delivery)}`, left, y); y += 16;
+    doc.text(`Processing fee: ${formatCurrency(data.processingFee)}`, left, y); y += 16;
+    doc.text(`Delivery: ${data.deliveryLabel}`, left, y); y += 16;
     doc.setFontSize(12); doc.setFont(undefined, 'bold');
-    doc.text(`Total paid: ${formatCurrency(data.total)}`, left, y); y += 22;
+    doc.text(`Total charged: ${formatCurrency(data.totalCharged)}`, left, y); y += 22;
     doc.setFontSize(10); doc.setFont(undefined, 'normal');
+    doc.text('Note: Delivery charges (if any) will be communicated to you after payment.', left, y); y += 18;
     doc.text('Thank you for ordering from SweetLove Gifts!', left, y);
-    // add a small decorative heart
     doc.setTextColor(255, 58, 99);
     doc.text('♥', 510, 60);
     const fname = `SweetLoveReceipt_${data.orderId || Date.now()}.pdf`;
@@ -758,5 +910,6 @@
   document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
+
 
 </html>
