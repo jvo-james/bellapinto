@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title> Valentine's Packages</title>
+
+  <!-- Font & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p8fXwXg6X0wq2b1vKxQk3y2p9CwqQxZl3s2s8xYQ7Kqg0q2QY2KxqQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Paystack & jsPDF (for receipt generation) -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Google Fonts: Raleway & Open Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Open+Sans&display=swap" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Animate.css for animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+ 
+ <style>
+
+
+  :root{
+    /* Color palette (light mode) */
+    --bg: #fffefc;
+    --muted-bg: #fff7f9;
+    --surface: #ffffff;
+    --card: #fff;
+    --text: #1f1f23;
+    --muted: #6b6b73;
+    --accent: #ff3860;      /* warm valentine pink */
+    --accent-2: #ff7aa2;    /* softer pink */
+    --accent-contrast: #ffffff;
+    --glass: rgba(255, 255, 255, 0.7);
+    --outline: rgba(31,31,35,0.08);
+    --shadow-sm: 0 6px 20px rgba(31,31,35,0.08);
+    --shadow-lg: 0 18px 60px rgba(31,31,35,0.12);
+    --success: #0bb27a;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --max-width: 1200px;
+    --container-pad: 18px;
+    --glass-border: rgba(255,122,162,0.12);
+  }
+
+  /* Reset & base */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter, Poppins, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:linear-gradient(180deg,var(--muted-bg),var(--bg)); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+  img{max-width:100%;height:auto;display:block}
+  a{color:inherit}
+  small{font-size:12px;color:var(--muted)}
+  button{font-family:inherit}
+
+  /* Layout container */
+  header, main, footer{max-width:var(--max-width);margin:0 auto;padding-left:var(--container-pad);padding-right:var(--container-pad)}
+  header{display:flex;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:18px}
+  .brand{display:flex;gap:14px;align-items:center}
+  .logo{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:var(--accent-contrast);box-shadow:var(--shadow-lg);font-size:24px}
+  .brand h1{margin:0;font-size:18px;letter-spacing:0.2px}
+  .lead{margin:0;font-size:13px;color:var(--muted)}
+
+  /* Top actions */
+  .actions-top{display:flex;gap:10px;align-items:center}
+  .outline{background:transparent;border:1px solid var(--outline);padding:10px 14px;border-radius:999px;color:var(--text);cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .outline:focus{outline:3px solid rgba(255,122,162,0.12);outline-offset:2px}
+
+  /* HERO (mobile-first) */
+  .hero{display:grid;gap:18px;padding-top:6px;padding-bottom:24px}
+  .eyebrow{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:6px 10px;border-radius:999px;color:var(--accent-contrast);font-weight:700;font-size:12px;box-shadow:0 8px 24px rgba(255,122,162,0.12)}
+  .headline{font-size:26px;line-height:1.05;margin:12px 0 6px 0;font-weight:700;color:var(--text)}
+  .sub{color:var(--muted);margin:0 0 12px 0}
+
+  /* Product grid/cards */
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  .card{
+    background:var(--card);
+    border:1px solid var(--outline);
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+    box-shadow:var(--shadow-sm);
+    transition:transform .22s ease, box-shadow .22s ease;
+    display:flex;flex-direction:column;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+  .product-media img{width:100%;height:180px;object-fit:cover}
+  .card-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+  .card-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .card h3{margin:0;font-size:18px}
+  .price-tag{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:6px 10px;border-radius:999px;color:var(--accent-contrast);font-weight:700;font-size:13px}
+  .features{font-size:13px;color:var(--muted);margin:0}
+  .choose{margin-top:auto;display:flex;justify-content:flex-end}
+  .btn{background:var(--accent);border:none;color:var(--accent-contrast);padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;box-shadow:0 10px 30px rgba(255,122,162,0.12);transition:transform .18s ease, box-shadow .18s ease}
+  .btn:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(255,122,162,0.14)}
+  .btn:active{transform:translateY(-1px)}
+  .btn.selected{box-shadow:0 22px 60px rgba(255,122,162,0.14)}
+
+  /* Order box (right column on larger screens) */
+  .order-box{
+    background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.86));
+    border:1px solid var(--outline);
+    border-radius:18px;padding:14px;box-shadow:var(--shadow-sm);
+    position:relative;
+  }
+  .order-box h4{margin:0 0 8px 0}
+  .field{display:flex;flex-direction:column;margin-bottom:10px}
+  label{font-size:13px;color:var(--muted);margin-bottom:6px}
+  input[type="text"],input[type="number"],select,textarea,input[readonly]{
+    background:transparent;border:1px solid var(--outline);padding:10px;border-radius:10px;color:var(--text);
+    font-size:14px;
+  }
+  input:focus,select:focus,textarea:focus{outline:3px solid rgba(255,122,162,0.12);outline-offset:2px}
+  textarea{resize:vertical;min-height:54px}
+
+  .summary{background:linear-gradient(180deg,rgba(246,245,247,0.8),rgba(255,255,255,0.9));border-radius:10px;padding:12px;border:1px solid var(--glass-border)}
+  .summary div{font-size:14px;color:var(--text)}
+  .summary hr{border:none;border-top:1px solid rgba(0,0,0,0.05);margin:10px 0}
+
+  /* Hearts decorative */
+  .hearts{position:absolute;right:16px;top:16px;display:flex;gap:6px}
+  .heart{width:12px;height:12px;border-radius:2px;background:var(--accent);transform:rotate(-45deg);box-shadow:0 8px 20px rgba(255,122,162,0.12);animation:slift 1.8s infinite}
+  .heart:nth-child(2){animation-delay:0.25s}
+  .heart:nth-child(3){animation-delay:0.5s}
+  @keyframes slift{0%{transform:scale(.85) rotate(-45deg) translateY(0);opacity:1}50%{transform:scale(1.2) rotate(-45deg) translateY(-10px);opacity:0.9}100%{transform:scale(.9) rotate(-45deg) translateY(0);opacity:1}}
+
+  /* Modal (desktop & mobile friendly) */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(31,31,35,0.35);display:flex;align-items:center;justify-content:center;z-index:9999;padding:18px}
+  .modal{width:760px;max-width:100%;background:var(--surface);border-radius:12px;padding:18px;border:1px solid var(--outline);box-shadow:0 28px 80px rgba(31,31,35,0.12);color:var(--text)}
+  .modal h3{margin:0 0 6px 0}
+  .modal .actions{display:flex;gap:8px;justify-content:flex-end}
+  .modal pre{white-space:pre-wrap;font-family:monospace}
+
+  /* Toast */
+  #slg-toast-container{font-weight:700}
+
+  /* Responsive layout for larger screens */
+  @media (min-width: 900px){
+    .hero{grid-template-columns:1fr 420px;align-items:start;padding-top:30px;padding-bottom:40px;gap:28px}
+    .grid{grid-template-columns:1fr;gap:14px}
+    .product-media img{height:220px}
+    header{padding-top:24px;padding-bottom:24px}
+    .logo{width:72px;height:72px;font-size:28px}
+  }
+
+  /* Product grid multi-column on wide screens */
+  @media (min-width: 1100px){
+    .grid{grid-template-columns:repeat(2,1fr);gap:18px}
+  }
+
+  /* Tight mobile tweaks */
+  @media (max-width:599px){
+    .product-media img{height:160px}
+    .headline{font-size:22px}
+    .card-body{padding:10px}
+    .order-box{padding:12px}
+    .btn{padding:9px 12px;font-size:14px}
+    .price-tag{font-size:12px;padding:6px 8px}
+  }
+
+  /* Very small screens: stack everything and make modal full-screen */
+  @media (max-width:420px){
+    .hero{gap:10px}
+    .card{border-radius:12px}
+    .modal{width:100%;height:100%;border-radius:0;overflow:auto}
+    .modal-backdrop{align-items:flex-end}
+  }
+
+  /* Print styles: hide interactive controls */
+  @media print{
+    header, .order-actions, .btn, .outline, .hearts, #slg-toast-container, footer, .modal-backdrop{display:none !important}
+    body{background:#fff}
+  }
+
+  /* Accessibility: focus visible for keyboard users */
+  :focus{outline:3px solid rgba(255,122,162,0.14);outline-offset:2px}
+</style>
+
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo"><i class="fa-solid fa-gift"></i></div>
+      <div>
+        <h1>SweetLove Gifts</h1>
+        <p class="lead">Valentine's Day packages...handcrafted, joyful</p>
+      </div>
+    </div>
+
+    <div class="actions-top">
+      <button class="outline" id="contactBtn"><i class="fa-solid fa-phone"></i> Contact</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Valentine's packages and order form">
+      <!-- LEFT: products -->
+      <div class="hero-left">
+        <div class="eyebrow"><i class="fa-solid fa-heart"></i> LIMITED — Valentine Special</div>
+        <h2 class="headline">Packages that say "I love you"...delivered with care</h2>
+        <p class="sub">Choose a ready-made package or build a little box of joy. Fast pickup or delivery across town. Beautiful gift wrap included.</p>
+
+        <div class="grid" role="list" aria-label="Package options">
+          <!-- Full package -->
+          <article class="card product-card" role="listitem" aria-labelledby="pkg-full-title" data-sku="full-package" data-price="350">
+            <figure class="product-media" aria-hidden="false">
+              <img src="full.jpg" alt="Full Valentine's package with drink, chocolate and sweets" />
+            </figure>
+            <div class="card-body">
+              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 id="pkg-full-title">Full Package</h3>
+                <span class="price-tag" aria-hidden="true"><i class="fa-solid fa-star"></i> GH₵ 350</span>
+              </div>
+              <p class="features">Includes: Welch's drink, premium chocolate, freshly-baked brownies, and curated foreign snacks.</p>
+              <div class="choose">
+                <button class="btn select-package" data-name="Full Package" data-price="350" aria-pressed="false">
+                  <i class="fa-solid fa-gift" aria-hidden="true"></i> Choose
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Brownies -->
+          <article class="card product-card" role="listitem" aria-labelledby="pkg-brownie-title" data-sku="brownies" data-price="300">
+            <figure class="product-media">
+              <img src="brownies.jpg" alt="Close-up of decadent gooey brownies" />
+            </figure>
+            <div class="card-body">
+              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 id="pkg-brownie-title">Brownies Only</h3>
+                <span class="price-tag"><i class="fa-solid fa-brownie"></i> GH₵ 300</span>
+              </div>
+              <p class="features">Decadent, gooey brownies...made fresh for Valentine's.</p>
+              <div class="choose">
+                <button class="btn select-package" data-name="Brownies" data-price="300" aria-pressed="false">
+                  <i class="fa-solid fa-check" aria-hidden="true"></i> Choose
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Chocolate -->
+          <article class="card product-card" role="listitem" aria-labelledby="pkg-choco-title" data-sku="chocolate" data-price="250">
+            <figure class="product-media">
+              <img src="choc.jpg" alt="Assorted chocolates (Kingsbite, Kit Kat, Snickers, Cadbury Heroes)" />
+            </figure>
+            <div class="card-body">
+              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 id="pkg-choco-title">Chocolate</h3>
+                <span class="price-tag"><i class="fa-solid fa-chocolate"></i> GH₵ 250</span>
+              </div>
+              <p class="features">Pick from Kingsbite, Kit Kat, Snickers, or Cadbury Heroes.</p>
+              <div class="choose">
+                <button class="btn select-package" data-name="Chocolate" data-price="250" aria-pressed="false">
+                  <i class="fa-solid fa-candy-cane" aria-hidden="true"></i> Choose
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- RIGHT: order form -->
+      <aside class="hero-right" aria-label="Order form">
+        <div class="order-box" role="region" aria-labelledby="order-title">
+          <div class="hearts" aria-hidden="true">
+            <div class="heart"></div><div class="heart"></div><div class="heart"></div>
+          </div>
+
+          <h4 id="order-title"><i class="fa-solid fa-shopping-cart" aria-hidden="true"></i> Your Order</h4>
+
+          <div class="field">
+            <label for="packageSelect">Selected package</label>
+            <input id="packageSelect" readonly value="No package chosen" aria-readonly="true" />
+          </div>
+
+          <div class="field">
+            <label for="chocoOption">Chocolate option (if applicable)</label>
+            <select id="chocoOption" aria-label="Choose chocolate flavor">
+              <option value="">-- select --</option>
+              <option>Kingsbite</option>
+              <option>Kit Kat</option>
+              <option>Snickers</option>
+              <option>Cadbury Heroes</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="qty">Quantity</label>
+            <input id="qty" type="number" min="1" value="1" aria-label="Quantity" />
+          </div>
+
+          <div class="field">
+            <label for="name">Full name</label>
+            <input id="name" placeholder="Recipient or buyer name" aria-required="true" />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" placeholder="e.g. 024xxxxxxxx" aria-required="true" />
+          </div>
+
+          <div class="field">
+            <label for="address">Delivery address (or 'pickup')</label>
+            <textarea id="address" rows="2" placeholder="Address or 'pickup'"></textarea>
+          </div>
+
+          <div class="field" aria-label="Delivery method">
+            <label>Delivery method</label>
+            <div class="delivery-options" role="radiogroup" aria-required="true">
+              <label class="outline" for="method-delivery"><input id="method-delivery" type="radio" name="method" value="delivery" checked /> Delivery</label>
+              <label class="outline" for="method-pickup"><input id="method-pickup" type="radio" name="method" value="pickup" /> Pickup</label>
+            </div>
+          </div>
+
+          <div class="summary" aria-live="polite" aria-atomic="true">
+            <div style="display:flex;justify-content:space-between">
+              <div>Subtotal</div><div id="subtotal">GH₵ 0</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px">
+              <div>Delivery</div><div id="deliveryCost">GH₵ 0</div>
+            </div>
+            <hr style="opacity:0.06;margin:10px 0" />
+            <div style="display:flex;justify-content:space-between;font-weight:700">
+              <div>Total</div><div id="total">GH₵ 0</div>
+            </div>
+          </div>
+
+          <div class="order-actions" style="margin-top:14px;display:flex;gap:8px">
+            <button class="btn" id="payBtn"><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Pay with Paystack</button>
+            <button class="outline" id="resetBtn"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Reset</button>
+          </div>
+
+          <p class="note" style="font-size:12px;opacity:0.75;margin-top:12px">
+            Secure payments via Paystack. Replace the publicKey variable in the script with your key.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Modal root: scripts will inject modal content here -->
+  <div id="modalRoot" aria-live="polite" style="display:none"></div>
+
+  <footer>
+    <small>Made with <i class="fa-solid fa-heart" style="color:var(--accent)"></i> — SweetLove Gifts</small>
+  </footer>
+</body>
+
+  <script>
+(() => {
+  // ---------- Configuration ----------
+  const config = {
+    prices: { "Full Package": 350, "Brownies": 300, "Chocolate": 250 },
+    paystackPublicKey: 'REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY', // <-- Put your Paystack public key here
+    currencySymbol: 'GH₵',
+    processingRate: 0.0295 // 2.95%
+  };
+
+  // ---------- Helpers ----------
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const el = (id) => document.getElementById(id);
+
+  const formatCurrency = (n) => `${config.currencySymbol} ${Number(n).toFixed(2)}`;
+
+  function showToast(message, opts = {}) {
+    let container = document.getElementById('slg-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'slg-toast-container';
+      container.style.position = 'fixed';
+      container.style.right = '18px';
+      container.style.bottom = '18px';
+      container.style.zIndex = 99999;
+      document.body.appendChild(container);
+    }
+    const node = document.createElement('div');
+    node.textContent = message;
+    node.setAttribute('role', 'status');
+    node.style.background = 'linear-gradient(90deg,#ff3860,#ff7aa2)';
+    node.style.color = '#120310';
+    node.style.padding = '10px 14px';
+    node.style.marginTop = '8px';
+    node.style.borderRadius = '10px';
+    node.style.boxShadow = '0 8px 30px rgba(0,0,0,0.4)';
+    node.style.fontWeight = '700';
+    container.appendChild(node);
+    setTimeout(() => node.style.opacity = '0.95', 10);
+    setTimeout(() => { node.style.transition = 'opacity 400ms'; node.style.opacity = '0'; }, opts.duration || 3600);
+    setTimeout(() => node.remove(), (opts.duration || 3600) + 600);
+  }
+
+  function escapeHtml(s = '') {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ---------- State ----------
+  const state = {
+    name: null,
+    price: 0,
+    sku: null
+  };
+
+  // ---------- Elements ----------
+  const packageSelectEl = el('packageSelect');
+  const chocoOptionEl = el('chocoOption');
+  const qtyEl = el('qty');
+  const subtotalEl = el('subtotal');
+  const deliveryCostEl = el('deliveryCost');
+  const totalEl = el('total');
+  const payBtn = el('payBtn');
+  const resetBtn = el('resetBtn');
+  const modalRoot = el('modalRoot');
+  const contactBtn = el('contactBtn');
+  const addressEl = el('address');
+  const methodDeliveryEl = el('method-delivery');
+  const methodPickupEl = el('method-pickup');
+
+  // ---------- Initialization ----------
+  function init() {
+    // Save original innerHTML for each package button so we can restore it when deselected
+    $$('.select-package').forEach(btn => {
+      const name = btn.dataset.name || (btn.closest('.product-card') && btn.closest('.product-card').dataset.sku) || '';
+      if (name === 'Brownies') {
+        // Brownies original icon per user's request
+        btn.dataset.origHtml = `<i class="fa-solid fa-cookie-bite" aria-hidden="true"></i> Choose`;
+      } else {
+        btn.dataset.origHtml = btn.innerHTML.trim();
+      }
+      btn.setAttribute('aria-pressed', 'false');
+    });
+
+    // wire package buttons (toggle/select)
+    $$('.select-package').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.name || (btn.closest('.product-card') && btn.closest('.product-card').dataset.sku) || null;
+        const price = Number(btn.dataset.price || (btn.closest('.product-card') && btn.closest('.product-card').dataset.price) || 0);
+        const sku = (btn.closest('.product-card') && btn.closest('.product-card').dataset.sku) || (name && name.toLowerCase()) || null;
+        if (!name) return;
+
+        const alreadySelected = (state.sku && sku && state.sku === sku);
+
+        if (alreadySelected) {
+          // Deselect current
+          deselectCurrentPackage();
+          showToast(`${name} removed from selection`);
+        } else {
+          // Select this package (and deselect any previous)
+          selectPackageButton(btn, { name, price, sku });
+        }
+      });
+    });
+
+    // qty update
+    qtyEl.addEventListener('input', updateSummary);
+    // delivery method change handlers
+    $$('input[name="method"]').forEach(r => r.addEventListener('change', () => { handleMethodChange(); updateSummary(); }));
+
+    // reset
+    resetBtn.addEventListener('click', doReset);
+
+    // pay
+    payBtn.addEventListener('click', startPaystackPayment);
+
+    // contact button (quick call)
+    contactBtn?.addEventListener('click', () => {
+      const phone = (el('phone')?.value || '').trim() || '';
+      if (phone) window.location.href = `tel:${phone}`;
+      else showToast('Add your phone number in the form first to call.');
+    });
+
+    // set initial method behavior
+    handleMethodChange();
+
+    // initial summary compute
+    updateSummary();
+
+    // warn about missing libs
+    if (typeof PaystackPop === 'undefined') {
+      console.warn('Paystack inline script not found. Payments will not work until you add: https://js.paystack.co/v1/inline.js');
+      showToast('Paystack not loaded — add Paystack script in <head>.', { duration: 6000 });
+    }
+    if (!window.jspdf) {
+      console.warn('jsPDF not found. PDF receipts will not work until you add jsPDF.');
+      showToast('jsPDF not loaded — add jsPDF script in <head>.', { duration: 6000 });
+    }
+  }
+
+  // ---------- Selection helpers ----------
+  function selectPackageButton(btn, { name, price, sku }) {
+    // Deselect previous if exists
+    if (state.sku) {
+      const prevBtn = $(`.select-package[aria-pressed="true"]`);
+      if (prevBtn && prevBtn !== btn) restoreButtonToOriginal(prevBtn);
+    }
+
+    // Update state
+    state.name = name;
+    state.price = Number(price || 0);
+    state.sku = sku;
+
+    // Update button: show check + Selected
+    btn.dataset.prevInner = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-check" aria-hidden="true"></i> Selected`;
+    btn.classList.add('selected');
+    btn.setAttribute('aria-pressed', 'true');
+
+    // Update the selected package input
+    packageSelectEl.value = name;
+    updateSummary();
+    showToast(`${name} selected — ${formatCurrency(state.price)}`);
+  }
+
+  function restoreButtonToOriginal(btn) {
+    const orig = btn.dataset.origHtml || btn.dataset.prevInner || btn.innerHTML;
+    btn.innerHTML = orig;
+    btn.classList.remove('selected');
+    btn.setAttribute('aria-pressed', 'false');
+  }
+
+  function deselectCurrentPackage() {
+    const prevBtn = $(`.select-package[aria-pressed="true"]`) || $$('.select-package').find(b => b.classList.contains('selected'));
+    if (prevBtn) restoreButtonToOriginal(prevBtn);
+
+    state.name = null;
+    state.price = 0;
+    state.sku = null;
+    packageSelectEl.value = 'No package chosen';
+    updateSummary();
+  }
+
+  // ---------- Address & delivery behavior (Task 2 preserved) ----------
+  function handleMethodChange() {
+    const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
+    if (method === 'pickup') {
+      // Autofill pickup address, make read-only
+      addressEl.value = 'UPSA hostel';
+      addressEl.setAttribute('readonly', 'true');
+      addressEl.setAttribute('aria-readonly', 'true');
+      addressEl.placeholder = '';
+      showSmallNote('Pickup selected — pickup address set to UPSA hostel.');
+    } else {
+      // Delivery selected: enable address and prompt
+      if (addressEl.value.trim() === 'UPSA hostel') addressEl.value = '';
+      addressEl.removeAttribute('readonly');
+      addressEl.removeAttribute('aria-readonly');
+      addressEl.placeholder = "Enter delivery address — delivery charges will be arranged after payment";
+      showSmallNote('Delivery selected — delivery charges will be communicated after payment.');
+    }
+  }
+
+  function showSmallNote(text) {
+    let note = document.querySelector('.delivery-note');
+    if (!note) {
+      note = document.createElement('div');
+      note.className = 'delivery-note';
+      note.style.fontSize = '12px';
+      note.style.color = '#6b6b73';
+      note.style.marginTop = '8px';
+      note.style.opacity = '0.95';
+      const summary = document.querySelector('.summary');
+      if (summary) summary.appendChild(note);
+    }
+    note.textContent = text;
+  }
+
+  // ---------- Form helpers ----------
+  function doReset() {
+    state.name = null; state.price = 0; state.sku = null;
+    packageSelectEl.value = 'No package chosen';
+    chocoOptionEl.value = '';
+    qtyEl.value = 1;
+    el('name').value = ''; el('phone').value = ''; addressEl.value = '';
+    $$('.select-package').forEach(b => { restoreButtonToOriginal(b); b.setAttribute('aria-pressed', 'false'); });
+    // default to delivery (matches HTML) and update
+    methodDeliveryEl.checked = true;
+    handleMethodChange();
+    updateSummary();
+    showToast('Form reset');
+  }
+
+  function ensureProcessingRowExists() {
+    // create processing fee row (id=processingFeeRow) between delivery row and hr if not exists
+    const summary = document.querySelector('.summary');
+    if (!summary) return;
+    if (!document.getElementById('processingFeeRow')) {
+      // create wrapper
+      const row = document.createElement('div');
+      row.id = 'processingFeeRow';
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.marginTop = '6px';
+      row.innerHTML = `<div>Processing fee</div><div id="processingFee">${formatCurrency(0)}</div>`;
+      // find hr and insert row before hr
+      const hr = summary.querySelector('hr');
+      if (hr) summary.insertBefore(row, hr);
+      else summary.appendChild(row);
+    }
+  }
+
+  function updateSummary() {
+    ensureProcessingRowExists();
+
+    const q = Math.max(1, parseInt(qtyEl.value || 1));
+    const sub = (state.price || 0) * q;
+    const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
+
+    let deliveryLabel;
+    if (method === 'pickup') {
+      deliveryLabel = formatCurrency(0);
+    } else {
+      deliveryLabel = 'To be arranged';
+    }
+
+    // processing fee = 2.95% of subtotal (rounded to 2 decimals)
+    const processingFeeRaw = sub * config.processingRate;
+    const processingFee = Math.round(processingFeeRaw * 100) / 100;
+
+    const totalCharged = Math.round((sub + processingFee) * 100) / 100;
+
+    subtotalEl.textContent = formatCurrency(sub);
+    deliveryCostEl.textContent = deliveryLabel;
+
+    // set processing fee in DOM
+    const feeEl = document.getElementById('processingFee');
+    if (feeEl) feeEl.textContent = formatCurrency(processingFee);
+
+    // total displayed is totalCharged (processing included)
+    totalEl.textContent = formatCurrency(totalCharged);
+
+    // store on state for later use in payment
+    state._calc = { q, sub, processingFee, totalCharged, method };
+  }
+
+  // ---------- Payment flow (Task 3: processing fee included) ----------
+  function startPaystackPayment() {
+    // validation
+    if (!state.name) { alert('Please choose a package first.'); return; }
+    const buyerName = (el('name')?.value || '').trim();
+    const phone = (el('phone')?.value || '').trim();
+    let address = (addressEl?.value || '').trim();
+    const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
+
+    if (!buyerName) { alert('Please enter a name.'); el('name').focus(); return; }
+    if (!phone) { alert('Please enter a phone number.'); el('phone').focus(); return; }
+    if (state.name === 'Chocolate' && (!chocoOptionEl.value || chocoOptionEl.value === '')) {
+      alert('Please choose a chocolate flavor for the Chocolate package.');
+      chocoOptionEl.focus();
+      return;
+    }
+
+    // enforce address rules
+    if (method === 'pickup') {
+      address = 'UPSA hostel';
+    } else {
+      if (!address) { alert('Please enter your delivery address. Delivery charges will be arranged after payment.'); addressEl.focus(); return; }
+    }
+
+    // Ensure summary calculations up-to-date
+    updateSummary();
+    const calc = state._calc || {};
+    const sub = calc.sub || 0;
+    const processingFee = calc.processingFee || 0;
+    const totalToCharge = calc.totalCharged || sub + processingFee;
+
+    // verify Paystack loaded and key configured
+    if (typeof PaystackPop === 'undefined') {
+      alert('Payment provider not loaded. Make sure you included the Paystack inline script in the page head.');
+      return;
+    }
+    if (!config.paystackPublicKey || config.paystackPublicKey.includes('REPLACE_WITH')) {
+      alert('Paystack public key not configured. Open the script and set config.paystackPublicKey to your key.');
+      return;
+    }
+
+    // Paystack expects amount in the smallest currency unit (pesewas). Multiply by 100.
+    const amountInSmallest = Math.round(totalToCharge * 100);
+
+    // Build metadata
+    const metadata = {
+      custom_fields: [
+        { display_name: 'Phone', variable_name: 'phone', value: phone },
+        { display_name: 'Package', variable_name: 'package', value: state.name },
+        { display_name: 'Quantity', variable_name: 'quantity', value: calc.q || 1 },
+        { display_name: 'Flavor', variable_name: 'flavor', value: (state.name === 'Chocolate' ? chocoOptionEl.value : 'N/A') },
+        { display_name: 'Address', variable_name: 'address', value: address },
+        { display_name: 'ProcessingFee', variable_name: 'processing_fee', value: processingFee },
+        { display_name: 'DeliveryNote', variable_name: 'delivery_note', value: method === 'delivery' ? 'Delivery charges to be communicated after payment' : 'Pickup at UPSA hostel' }
+      ]
+    };
+
+    const uniqueRef = `SLG-${Date.now()}-${Math.floor(Math.random()*90000+10000)}`;
+
+    // open Paystack popup
+    const handler = PaystackPop.setup({
+      key: config.paystackPublicKey,
+      email: `${buyerName.replace(/\s+/g, '').toLowerCase() || 'buyer'}@example.com`,
+      amount: amountInSmallest,
+      currency: 'GHS',
+      ref: uniqueRef,
+      metadata,
+      onClose: function() {
+        showToast('Payment window closed');
+      },
+      callback: function(response) {
+        // Prepare receipt data. include processingFee and totalCharged
+        const receiptData = {
+          orderId: uniqueRef,
+          payRef: response.reference || uniqueRef,
+          buyerName,
+          phone,
+          address,
+          method,
+          q: calc.q || 1,
+          sub,
+          processingFee,
+          deliveryLabel: (method === 'pickup') ? 'Pickup: UPSA hostel' : 'To be arranged (we will contact you)',
+          totalCharged: Math.round((sub + processingFee) * 100) / 100,
+          chosenChocolate: chocoOptionEl.value || ''
+        };
+        showSuccessModal(receiptData);
+        showToast('Payment successful — receipt ready. Delivery charges will be arranged after payment if applicable.');
+      }
+    });
+
+    handler.openIframe();
+  }
+
+  // ---------- Modal & Receipt (Task 3 aware) ----------
+  function showSuccessModal(data) {
+    modalRoot.innerHTML = `
+      <div class="modal-backdrop" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9998">
+        <div class="modal" role="dialog" aria-modal="true" style="width:780px;max-width:96%;background:linear-gradient(180deg,#0f0c12,#0b0810);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 50px rgba(0,0,0,0.7);color:#fff">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="margin:0 0 6px 0"><i class="fa-solid fa-check-circle" style="color:var(--accent)"></i> Payment Successful</h3>
+              <div style="opacity:0.9">Thank you <strong>${escapeHtml(data.buyerName)}</strong> — your order is confirmed.</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;color:rgba(255,255,255,0.75)">Order ID</div>
+              <div style="font-weight:700">${escapeHtml(data.orderId)}</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <h4 style="margin:0 0 8px 0">Order summary</h4>
+              <div>Package: <strong>${escapeHtml(state.name)}</strong></div>
+              ${state.name === 'Chocolate' ? `<div>Flavor: <strong>${escapeHtml(data.chosenChocolate || 'Not chosen')}</strong></div>` : ''}
+              <div>Quantity: <strong>${data.q}</strong></div>
+              <div>Delivery method: <strong>${escapeHtml(data.method)}</strong></div>
+              <div style="margin-top:8px">Phone: <strong>${escapeHtml(data.phone)}</strong></div>
+              <div>Address: <strong>${escapeHtml(data.address)}</strong></div>
+            </div>
+
+            <div>
+              <h4 style="margin:0 0 8px 0">Payment</h4>
+              <div>Subtotal: ${formatCurrency(data.sub)}</div>
+              <div>Processing fee: ${formatCurrency(data.processingFee)}</div>
+              <div>Delivery: <strong>${escapeHtml(data.deliveryLabel)}</strong></div>
+              <div style="margin-top:8px;font-weight:700">Total charged: ${formatCurrency(data.totalCharged)}</div>
+              <div style="margin-top:12px;font-size:13px;color:rgba(255,255,255,0.65)">Payment ref: <code style="background:transparent;border-radius:6px;padding:4px 6px;color:var(--accent)">${escapeHtml(data.payRef)}</code></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+            <button class="btn" id="downloadPdfBtn"><i class="fa-solid fa-file-pdf"></i> Download receipt (PDF)</button>
+            <button class="outline" id="printBtn"><i class="fa-solid fa-print"></i> Print</button>
+            <button class="outline" id="emailBtn"><i class="fa-solid fa-envelope"></i> Email receipt</button>
+            <button class="outline" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy receipt</button>
+            <button class="outline" id="closeModalBtn"><i class="fa-solid fa-xmark"></i> Close</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    modalRoot.style.display = 'block';
+
+    // Hook up buttons
+    el('closeModalBtn').addEventListener('click', () => { modalRoot.innerHTML = ''; modalRoot.style.display = 'none'; });
+    el('printBtn').addEventListener('click', () => printReceipt(data));
+    el('downloadPdfBtn').addEventListener('click', () => downloadPdfReceipt(data));
+    el('emailBtn').addEventListener('click', () => emailReceipt(data));
+    el('copyBtn').addEventListener('click', () => copyReceiptToClipboard(data));
+  }
+
+  function receiptText(data) {
+    return [
+      'SweetLove Gifts — Receipt',
+      '----------------------------------------',
+      `Order ID: ${data.orderId}`,
+      `Payment reference: ${data.payRef}`,
+      `Buyer: ${data.buyerName}`,
+      `Phone: ${data.phone}`,
+      `Package: ${state.name}`,
+      `Flavor: ${state.name === 'Chocolate' ? (data.chosenChocolate || 'N/A') : 'N/A'}`,
+      `Quantity: ${data.q}`,
+      `Delivery method: ${data.method}`,
+      `Address: ${data.address}`,
+      '',
+      `Subtotal: ${formatCurrency(data.sub)}`,
+      `Processing fee: ${formatCurrency(data.processingFee)}`,
+      `Delivery: ${data.deliveryLabel}`,
+      `Total charged: ${formatCurrency(data.totalCharged)}`,
+      '',
+      'Note: Delivery charges (if any) will be communicated to you after payment.',
+      '',
+      'Thank you for choosing SweetLove Gifts!',
+      'Contact us if you have any questions.'
+    ].join('\n');
+  }
+
+  function copyReceiptToClipboard(data) {
+    const text = receiptText(data);
+    navigator.clipboard?.writeText(text).then(() => {
+      showToast('Receipt copied to clipboard');
+    }).catch(() => {
+      alert('Could not copy receipt automatically. You can download the PDF instead.');
+    });
+  }
+
+  function emailReceipt(data) {
+    const subject = encodeURIComponent(`Your SweetLove Gifts receipt - ${data.orderId}`);
+    const body = encodeURIComponent(receiptText(data));
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+
+  function printReceipt(data) {
+    const w = window.open('', '_blank');
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Receipt - ${escapeHtml(data.orderId)}</title>
+          <style>
+            body{font-family: Arial, Helvetica, sans-serif;padding:24px;color:#111}
+            pre{font-family:monospace;white-space:pre-wrap}
+            .header{display:flex;justify-content:space-between;align-items:center}
+            .brand{font-weight:700;color:#d6336c}
+            .note{font-size:12px;color:#555;margin-top:12px}
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="brand">SweetLove Gifts</div>
+              <div>Receipt</div>
+            </div>
+            <div>Order ID: ${escapeHtml(data.orderId)}</div>
+          </div>
+          <hr>
+          <pre>${escapeHtml(receiptText(data))}</pre>
+        </body>
+      </html>
+    `;
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(() => { w.print(); }, 300);
+  }
+
+  async function downloadPdfReceipt(data) {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert('PDF generator not loaded. Add jsPDF to the page to download receipts.');
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const left = 40;
+    let y = 60;
+    doc.setFontSize(18);
+    doc.text('SweetLove Gifts — Receipt', left, y);
+    doc.setFontSize(11);
+    y += 26;
+    doc.text(`Order ID: ${data.orderId}`, left, y); y += 16;
+    doc.text(`Payment reference: ${data.payRef}`, left, y); y += 18;
+    doc.text(`Buyer: ${data.buyerName}`, left, y); y += 16;
+    doc.text(`Phone: ${data.phone}`, left, y); y += 16;
+    doc.text(`Package: ${state.name}`, left, y); y += 16;
+    if (state.name === 'Chocolate') { doc.text(`Flavor: ${data.chosenChocolate || 'N/A'}`, left, y); y += 16; }
+    doc.text(`Quantity: ${data.q}`, left, y); y += 16;
+    doc.text(`Delivery method: ${data.method}`, left, y); y += 16;
+    doc.text(`Address: ${data.address}`, left, y); y += 22;
+
+    doc.text(`Subtotal: ${formatCurrency(data.sub)}`, left, y); y += 16;
+    doc.text(`Processing fee: ${formatCurrency(data.processingFee)}`, left, y); y += 16;
+    doc.text(`Delivery: ${data.deliveryLabel}`, left, y); y += 16;
+    doc.setFontSize(12); doc.setFont(undefined, 'bold');
+    doc.text(`Total charged: ${formatCurrency(data.totalCharged)}`, left, y); y += 22;
+    doc.setFontSize(10); doc.setFont(undefined, 'normal');
+    doc.text('Note: Delivery charges (if any) will be communicated to you after payment.', left, y); y += 18;
+    doc.text('Thank you for ordering from SweetLove Gifts!', left, y);
+    doc.setTextColor(255, 58, 99);
+    doc.text('♥', 510, 60);
+    const fname = `SweetLoveReceipt_${data.orderId || Date.now()}.pdf`;
+    doc.save(fname);
+    showToast('PDF receipt downloaded');
+  }
+
+  // ---------- Kickoff ----------
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+
+</html>
