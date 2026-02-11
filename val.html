@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine's Packages — SweetLove Gifts</title>
+
+  <!-- Font & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p8fXwXg6X0wq2b1vKxQk3y2p9CwqQxZl3s2s8xYQ7Kqg0q2QY2KxqQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Paystack & jsPDF (for receipt generation) -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --accent:#ff3860; /* valentine pink */
+      --accent-2:#ff7aa2;
+      --bg:#100d12;
+      --card:#111018;
+      --glass: rgba(255,255,255,0.05);
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial; background: radial-gradient(ellipse at top right, rgba(255,122,162,0.06), transparent 10%), linear-gradient(180deg,#0b0810 0%, #150e18 100%); color:#fff}
+
+    /* Header */
+    header{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;backdrop-filter: blur(6px);}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(255,122,162,0.12)}
+    .logo i{font-size:28px}
+    h1{font-size:18px;margin:0}
+    p.lead{margin:0;font-size:12px;opacity:0.85}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 480px;gap:30px;padding:28px;align-items:center}
+    .hero-left{padding:28px}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:6px 10px;border-radius:999px;font-weight:600;color:#120310}
+    .headline{font-size:44px;line-height:1.02;margin:18px 0}
+    .sub{opacity:0.85;margin-bottom:20px}
+    .cta{display:flex;gap:12px}
+
+    /* Cards */
+    .grid{display:flex;gap:16px;flex-wrap:wrap}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:16px;flex:1;min-width:240px}
+    .card h3{margin:0 0 8px 0}
+    .price{font-weight:700;font-size:20px}
+    .features{font-size:13px;color:rgba(255,255,255,0.85);margin-top:10px}
+    .choose{margin-top:12px;display:flex;align-items:center;gap:8px}
+    .btn{background:var(--accent);border:none;padding:10px 14px;border-radius:12px;color:#120310;font-weight:700;cursor:pointer}
+    .outline{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 14px;border-radius:12px;color:#fff}
+
+    /* Right-side order box */
+    .order-box{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;padding:20px;border:1px solid rgba(255,255,255,0.04);position:relative}
+    .order-box h4{margin:0 0 12px 0}
+    .field{display:flex;flex-direction:column;margin-bottom:12px}
+    input,select,textarea{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:10px;color:#fff}
+    label{font-size:12px;margin-bottom:6px;opacity:0.9}
+    .summary{background:var(--glass);padding:12px;border-radius:10px;margin-top:8px}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:80;backdrop-filter:blur(6px)}
+    .modal{width:720px;max-width:92%;background:linear-gradient(180deg,#0f0c12,#0b0810);padding:20px;border-radius:16px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 50px rgba(0,0,0,0.7)}
+    .modal h3{margin-top:0}
+    .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+
+    /* Little decorations */
+    .hearts{position:absolute;right:18px;top:18px;display:flex;gap:6px}
+    .heart{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 6px 18px rgba(255,58,99,0.12);transform:rotate(-45deg) translateY(0);animation:pop 1.6s infinite}
+    .heart:nth-child(2){animation-delay:0.3s}
+    .heart:nth-child(3){animation-delay:0.6s}
+    @keyframes pop{0%{transform:scale(0.8) translateY(0);}50%{transform:scale(1.2) translateY(-10px);}100%{transform:scale(0.9) translateY(0)}}
+
+    /* Footer */
+    footer{padding:18px 28px;text-align:center;color:rgba(255,255,255,0.6);font-size:13px}
+
+    /* responsive */
+    @media (max-width:920px){.hero{grid-template-columns:1fr;}.hero-right{order:2}.hero-left{order:1}}
+
+    /* small touches */
+    .price-tag{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:6px 10px;border-radius:999px;color:#120310;font-weight:700}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo"><i class="fa-solid fa-gift"></i></div>
+      <div>
+        <h1>SweetLove Gifts</h1>
+        <p class="lead">Valentine's Day packages — handcrafted, joyful</p>
+      </div>
+    </div>
+    <div>
+      <button class="outline" id="contactBtn"><i class="fa-solid fa-phone"></i> Contact</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-left">
+        <div class="eyebrow"><i class="fa-solid fa-heart"></i> LIMITED — Valentine Special</div>
+        <h2 class="headline">Packages that say "I love you" — delivered with care</h2>
+        <p class="sub">Choose a ready-made package or build a little box of joy. Fast pickup or delivery across town. Beautiful gift wrap included.</p>
+
+        <div class="grid">
+          <!-- Full package -->
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3>Full Package</h3>
+              <span class="price-tag"><i class="fa-solid fa-star"></i> GH₵ 350</span>
+            </div>
+            <div class="features">Includes: Welch's drink, premium chocolate, freshly-baked brownies, and curated foreign snacks — wrapped with love.</div>
+            <div class="choose">
+              <button class="btn select-package" data-name="Full Package" data-price="350"><i class="fa-solid fa-gift"></i> Choose</button>
+            </div>
+          </div>
+
+          <!-- Brownies -->
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3>Brownies Only</h3>
+              <span class="price-tag"><i class="fa-solid fa-brownie"></i> GH₵ 300</span>
+            </div>
+            <div class="features">Decadent, gooey brownies — made fresh for Valentine's.</div>
+            <div class="choose">
+              <button class="btn select-package" data-name="Brownies" data-price="300"><i class="fa-solid fa-check"></i> Choose</button>
+            </div>
+          </div>
+
+          <!-- Chocolate single -->
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3>Chocolate</h3>
+              <span class="price-tag"><i class="fa-solid fa-chocolate"></i> GH₵ 45</span>
+            </div>
+            <div class="features">Pick from Kingsbite, Kit Kat, Snickers, or Cadbury Heroes.</div>
+            <div class="choose">
+              <button class="btn select-package" data-name="Chocolate" data-price="45"><i class="fa-solid fa-candy-cane"></i> Choose</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero-right">
+        <div class="order-box">
+          <div class="hearts"><div class="heart"></div><div class="heart"></div><div class="heart"></div></div>
+          <h4><i class="fa-solid fa-shopping-cart"></i> Your Order</h4>
+          <div class="field">
+            <label for="packageSelect">Selected package</label>
+            <input id="packageSelect" readonly value="No package chosen" />
+          </div>
+
+          <div class="field">
+            <label for="chocoOption">Chocolate option (if applicable)</label>
+            <select id="chocoOption">
+              <option value="">-- select --</option>
+              <option>Kingsbite</option>
+              <option>Kit Kat</option>
+              <option>Snickers</option>
+              <option>Cadbury Heroes</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="qty">Quantity</label>
+            <input id="qty" type="number" min="1" value="1" />
+          </div>
+
+          <div class="field">
+            <label for="name">Full name</label>
+            <input id="name" placeholder="Recipient or buyer name" />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" placeholder="e.g. 024xxxxxxxx" />
+          </div>
+
+          <div class="field">
+            <label for="address">Delivery address (or 'pickup')</label>
+            <textarea id="address" rows="2" placeholder="Address or 'pickup'"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Delivery method</label>
+            <div style="display:flex;gap:8px">
+              <label class="outline"><input type="radio" name="method" value="delivery" checked /> Delivery</label>
+              <label class="outline"><input type="radio" name="method" value="pickup" /> Pickup</label>
+            </div>
+          </div>
+
+          <div class="summary">
+            <div style="display:flex;justify-content:space-between"><div>Subtotal</div><div id="subtotal">GH₵ 0</div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px"><div>Delivery</div><div id="deliveryCost">GH₵ 0</div></div>
+            <hr style="opacity:0.06;margin:10px 0" />
+            <div style="display:flex;justify-content:space-between;font-weight:700"><div>Total</div><div id="total">GH₵ 0</div></div>
+          </div>
+
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <button class="btn" id="payBtn"><i class="fa-solid fa-credit-card"></i> Pay with Paystack</button>
+            <button class="outline" id="resetBtn"><i class="fa-solid fa-rotate"></i> Reset</button>
+          </div>
+
+          <p style="font-size:12px;opacity:0.75;margin-top:12px">Secure payments via Paystack. Replace the publicKey variable in the script with your key.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Modal (hidden by default) -->
+  <div id="modalRoot" style="display:none"></div>
+
+  <footer>
+    <small>Made with <i class="fa-solid fa-heart" style="color:var(--accent)"></i> — SweetLove Gifts</small>
+  </footer>
+
+  <script>
+    /* ====== Configuration (edit prices or keys here) ====== */
+    const config = {
+      prices: { "Full Package": 350, "Brownies": 300, "Chocolate": 45 },
+      paystackPublicKey: 'REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY', // e.g. pk_test_xxx or pk_live_xxx
+      currency: 'GHS'
+    };
+
+    // Utility
+    const \$ = (s) => document.querySelector(s);
+    const el = (id) => document.getElementById(id);
+
+    // Elements
+    const packageSelect = el('packageSelect');
+    const chocoOption = el('chocoOption');
+    const qty = el('qty');
+    const subtotalEl = el('subtotal');
+    const totalEl = el('total');
+    const deliveryCostEl = el('deliveryCost');
+
+    let current = { name: null, price: 0 };
+
+    // Select package buttons
+    document.querySelectorAll('.select-package').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price);
+        current.name = name;
+        current.price = price;
+        packageSelect.value = name + (name === 'Chocolate' ? ' — choose flavor' : '');
+        updateSummary();
+        // highlight selected
+        document.querySelectorAll('.select-package').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+
+    function updateSummary(){
+      const q = Math.max(1, parseInt(qty.value||1));
+      const sub = (current.price || 0) * q;
+      // delivery rules: free for pickup, 15 for delivery
+      const method = document.querySelector('input[name="method"]:checked').value;
+      const delivery = method === 'pickup' ? 0 : (sub>0?15:0);
+      subtotalEl.textContent = `GH₵ ${sub.toFixed(2)}`;
+      deliveryCostEl.textContent = `GH₵ ${delivery.toFixed(2)}`;
+      totalEl.textContent = `GH₵ ${(sub + delivery).toFixed(2)}`;
+    }
+
+    qty.addEventListener('input', updateSummary);
+    document.querySelectorAll('input[name="method"]').forEach(r => r.addEventListener('change', updateSummary));
+
+    el('resetBtn').addEventListener('click', ()=>{
+      current = { name: null, price: 0 };
+      packageSelect.value = 'No package chosen';
+      chocoOption.value = '';
+      qty.value = 1;
+      el('name').value='';el('phone').value='';el('address').value='';
+      updateSummary();
+    });
+
+    // initial update
+    updateSummary();
+
+    /* ====== Paystack payment flow ====== */
+    function startPaystackPayment(){
+      if(!current.name){
+        alert('Please choose a package first.');
+        return;
+      }
+      // validate form
+      const buyerName = el('name').value.trim();
+      const phone = el('phone').value.trim();
+      const address = el('address').value.trim() || 'Pickup';
+      if(!buyerName || !phone){ alert('Please enter name and phone.'); return; }
+
+      const q = Math.max(1, parseInt(qty.value||1));
+      const sub = (current.price || 0) * q;
+      const method = document.querySelector('input[name="method"]:checked').value;
+      const delivery = method === 'pickup' ? 0 : (sub>0?15:0);
+      const total = sub + delivery;
+
+      // Paystack requires amount in kobo (if currency is NGN). For GHS Paystack still expects pesewas? Paystack supports GHS where amount is in pesewas.
+      // We'll multiply by 100 to convert cedis to pesewas so it works for test/demo. Adjust if needed.
+      const amountInSmallest = Math.round(total * 100);
+
+      const handler = PaystackPop.setup({
+        key: config.paystackPublicKey,
+        email: (buyerName.replace(/\s+/g,'') || 'buyer') + '@example.com',
+        amount: amountInSmallest,
+        currency: 'GHS',
+        ref: 'SLG-' + Date.now() + '-' + Math.floor(Math.random()*10000),
+        metadata: {
+          custom_fields: [
+            {display_name: 'Phone', variable_name: 'phone', value: phone},
+            {display_name: 'Package', variable_name: 'package', value: current.name}
+          ]
+        },
+        callback: function(response){
+          // Payment was successful according to Paystack. You should verify on your server in production.
+          showSuccessModal({
+            orderId: response.reference || 'REF-'+Date.now(),
+            payRef: response.reference || '',
+            buyerName, phone, address, method, q, sub, delivery, total,
+            chosenChocolate: chocoOption.value
+          });
+        },
+        onClose: function(){
+          console.log('Payment popup closed');
+        }
+      });
+      handler.openIframe();
+    }
+
+    el('payBtn').addEventListener('click', startPaystackPayment);
+
+    /* ====== Modal generation with receipt PDF generation ====== */
+    function showSuccessModal(data){
+      const modalRoot = el('modalRoot');
+      const html = `
+        <div class="modal-backdrop">
+          <div class="modal" role="dialog" aria-modal="true">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h3><i class="fa-solid fa-check-circle" style="color:var(--accent)"></i> Payment Successful</h3>
+                <div style="opacity:0.85">Thank you <strong>${escapeHtml(data.buyerName)}</strong> — your order is confirmed.</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:12px;color:rgba(255,255,255,0.75)">Order ID</div>
+                <div style="font-weight:700">${escapeHtml(data.orderId)}</div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div>
+                <h4 style="margin:0 0 8px 0">Order summary</h4>
+                <div>Package: <strong>${escapeHtml(current.name || data.chosenChocolate)}</strong></div>
+                ${current.name === 'Chocolate' ? `<div>Flavor: <strong>${escapeHtml(data.chosenChocolate || 'Not chosen')}</strong></div>` : ''}
+                <div>Quantity: <strong>${data.q}</strong></div>
+                <div>Delivery method: <strong>${escapeHtml(data.method)}</strong></div>
+                <div style="margin-top:8px">Phone: <strong>${escapeHtml(data.phone)}</strong></div>
+                <div>Address: <strong>${escapeHtml(data.address)}</strong></div>
+              </div>
+              <div>
+                <h4 style="margin:0 0 8px 0">Payment</h4>
+                <div>Subtotal: GH₵ ${data.sub.toFixed(2)}</div>
+                <div>Delivery: GH₵ ${data.delivery.toFixed(2)}</div>
+                <div style="margin-top:8px;font-weight:700">Total paid: GH₵ ${data.total.toFixed(2)}</div>
+                <div style="margin-top:12px;font-size:13px;color:rgba(255,255,255,0.65)">Paystack reference: <code style="background:transparent;border-radius:6px;padding:4px 6px;color:var(--accent)">${escapeHtml(data.payRef)}</code></div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn" id="downloadPdfBtn"><i class="fa-solid fa-file-pdf"></i> Download receipt (PDF)</button>
+              <button class="outline" id="printBtn"><i class="fa-solid fa-print"></i> Print</button>
+              <button class="outline" id="emailBtn"><i class="fa-solid fa-envelope"></i> Email receipt</button>
+              <button class="outline" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy receipt</button>
+              <button class="outline" id="closeModalBtn"><i class="fa-solid fa-xmark"></i> Close</button>
+            </div>
+          </div>
+        </div>
+      `;
+      modalRoot.innerHTML = html;
+      modalRoot.style.display = 'block';
+
+      // Hook actions
+      document.getElementById('closeModalBtn').addEventListener('click', ()=>{ modalRoot.innerHTML=''; modalRoot.style.display='none'; });
+      document.getElementById('printBtn').addEventListener('click', ()=>{ printReceipt(data); });
+      document.getElementById('downloadPdfBtn').addEventListener('click', ()=>{ downloadPdfReceipt(data); });
+      document.getElementById('emailBtn').addEventListener('click', ()=>{ emailReceipt(data); });
+      document.getElementById('copyBtn').addEventListener('click', ()=>{ copyReceiptToClipboard(data); });
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+    function receiptText(data){
+      return `Order Receipt\n\nOrder ID: ${data.orderId}\nReference: ${data.payRef}\nBuyer: ${data.buyerName}\nPhone: ${data.phone}\nPackage: ${current.name || data.chosenChocolate}\nFlavor: ${data.chosenChocolate || 'N/A'}\nQuantity: ${data.q}\nDelivery method: ${data.method}\nAddress: ${data.address}\n\nSubtotal: GH₵ ${data.sub.toFixed(2)}\nDelivery: GH₵ ${data.delivery.toFixed(2)}\nTotal paid: GH₵ ${data.total.toFixed(2)}\n\nThank you for ordering from SweetLove Gifts!`;
+    }
+
+    function copyReceiptToClipboard(data){ navigator.clipboard.writeText(receiptText(data)).then(()=>{ alert('Receipt copied to clipboard.'); }).catch(()=>{ alert('Could not copy.'); }); }
+
+    function emailReceipt(data){
+      const subject = encodeURIComponent('Your SweetLove Gifts receipt - ' + data.orderId);
+      const body = encodeURIComponent(receiptText(data));
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
+
+    function printReceipt(data){
+      const w = window.open('', '_blank');
+      w.document.write('<pre style="font-family:monospace;white-space:pre-wrap">' + escapeHtml(receiptText(data)) + '</pre>');
+      w.document.close();
+      w.print();
+    }
+
+    async function downloadPdfReceipt(data){
+      // Using jsPDF to create a simple receipt
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({unit:'pt', format:'a4'});
+      const left = 40;
+      let y = 50;
+      doc.setFontSize(18); doc.text('SweetLove Gifts — Receipt', left, y); y += 26;
+      doc.setFontSize(11);
+      const lines = receiptText(data).split('\n');
+      for(const line of lines){ doc.text(line, left, y); y += 16; }
+      // Add a little heart mark
+      doc.setTextColor(255, 58, 99);
+      doc.text('♥', 500, 50);
+      const fname = `Receipt_${data.orderId || Date.now()}.pdf`;
+      doc.save(fname);
+    }
+
+    // contact button quick action
+    el('contactBtn').addEventListener('click', ()=>{
+      const phone = el('phone').value || '024xxxxxxx';
+      window.location.href = `tel:${phone}`;
+    });
+
+    // little UX: set currently chosen package to match config prices if user edits top config
+    // (makes it easy to change prices in one place)
+    // Add a tiny sparkle animation to buy button
+    const style = document.createElement('style');
+    style.innerHTML = `.btn.selected{box-shadow:0 12px 40px rgba(255,122,162,0.18);transform:translateY(-3px)} .btn{transition:all 220ms ease}`;
+    document.head.appendChild(style);
+
+    // Helpful note for developer
+    console.log('SweetLove Gifts demo loaded. Replace config.paystackPublicKey with your real key.');
+  </script>
+</body>
+</html>
