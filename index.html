@@ -455,8 +455,8 @@
     <div class="brand">
       <div class="logo"><i class="fa-solid fa-gift"></i></div>
       <div>
-        <h1>SweetLove Gifts</h1>
-        <p class="lead">Valentine's Day packages...handcrafted, joyful</p>
+        <h1>BêllaBox</h1>
+        <p class="lead">Moments, beautifully wrapped.</p>
       </div>
     </div>
 
@@ -469,7 +469,7 @@
     <section class="hero" aria-label="Valentine's packages and order form">
       <!-- LEFT: products -->
       <div class="hero-left">
-        <div class="eyebrow"><i class="fa-solid fa-heart"></i> LIMITED — Valentine Special</div>
+        <div class="eyebrow"><i class="fa-solid fa-heart"></i> LIMITED - Valentine Special</div>
         <h2 class="headline">Packages that say "I love you"...delivered with care</h2>
         <p class="sub">Choose a ready-made package or build a little box of joy. Fast pickup or delivery across town. Beautiful gift wrap included.</p>
 
@@ -612,7 +612,7 @@
           </div>
 
           <p class="note" style="font-size:12px;opacity:0.75;margin-top:12px">
-            Secure payments via Paystack. Replace the publicKey variable in the script with your key.
+            Secure payments via Paystack. 
           </p>
         </div>
       </aside>
@@ -623,7 +623,7 @@
   <div id="modalRoot" aria-live="polite" style="display:none"></div>
 
   <footer>
-    <small>Made with <i class="fa-solid fa-heart" style="color:var(--accent)"></i> — SweetLove Gifts</small>
+    <small>Made with <i class="fa-solid fa-heart" style="color:var(--accent)"></i> BêllaBox</small>
   </footer>
 </body>
 
@@ -822,12 +822,12 @@ function showToast(message, opts = {}) {
 
     // warn about missing libs
     if (typeof PaystackPop === 'undefined') {
-      console.warn('Paystack inline script not found. Payments will not work until you add: https://js.paystack.co/v1/inline.js');
-      showToast('Paystack not loaded — add Paystack script in <head>.', { duration: 6000 });
+      console.warn('Paystack inline script not found.');
+      showToast('Paystack not loaded.', { duration: 6000 });
     }
     if (!window.jspdf) {
-      console.warn('jsPDF not found. PDF receipts will not work until you add jsPDF.');
-      showToast('jsPDF not loaded — add jsPDF script in <head>.', { duration: 6000 });
+      console.warn('jsPDF not found.');
+      showToast('jsPDF not loaded.', { duration: 6000 });
     }
   }
 
@@ -852,7 +852,7 @@ function showContactModal() {
         </div>
 
         <div class="contact-body">
-          <p class="lead">We’re happy to help — reach us any time using the methods below.</p>
+          <p class="lead">We’re happy to help. Reach us any time using the methods below.</p>
           <ul class="contact-list">
             <li><a href="tel:${phone}"><i class="fa-solid fa-phone"></i><span><strong>Call</strong><div style="font-size:13px;color:var(--muted)">${phone}</div></span></a></li>
             <li><a href="https://wa.me/${waPhone}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span><strong>WhatsApp</strong><div style="font-size:13px;color:var(--muted)">${phone}</div></span></a></li>
@@ -949,14 +949,14 @@ function showContactModal() {
       addressEl.setAttribute('readonly', 'true');
       addressEl.setAttribute('aria-readonly', 'true');
       addressEl.placeholder = '';
-      showSmallNote('Pickup selected — pickup address set to UPSA hostel.');
+      showSmallNote('Pickup selected. Pickup address set to UPSA hostel.');
     } else {
       // Delivery selected: enable address and prompt
       if (addressEl.value.trim() === 'UPSA hostel') addressEl.value = '';
       addressEl.removeAttribute('readonly');
       addressEl.removeAttribute('aria-readonly');
-      addressEl.placeholder = "Enter delivery address — delivery charges will be arranged after payment";
-      showSmallNote('Delivery selected — delivery charges will be communicated after payment.');
+      addressEl.placeholder = "Enter delivery address. Delivery charges will be arranged after payment";
+      showSmallNote('Delivery selected. Delivery charges will be communicated after payment.');
     }
   }
 
@@ -993,7 +993,7 @@ function showContactModal() {
   async function sendToFormspree(data) {
     // If config.formspreeEndpoint is not set, skip gracefully
     if (!config.formspreeEndpoint || config.formspreeEndpoint.includes('yourFormId')) {
-      console.warn('Formspree endpoint not configured. Set config.formspreeEndpoint to your Formspree URL.');
+      console.warn('Formspree endpoint not configured.');
       return Promise.resolve(); // no-op
     }
 
@@ -1041,7 +1041,6 @@ function showContactModal() {
     } catch (err) {
       console.warn('Failed to send to Formspree:', err);
       showToast('Could not send order to Formspree (check config).', { duration: 4000 });
-      // don't block the main flow — return resolved promise so caller continues
       return Promise.resolve();
     }
   }
@@ -1132,11 +1131,11 @@ function showContactModal() {
 
     // verify Paystack loaded and key configured
     if (typeof PaystackPop === 'undefined') {
-      alert('Payment provider not loaded. Make sure you included the Paystack inline script in the page head.');
+      alert('Payment provider not loaded.');
       return;
     }
     if (!config.paystackPublicKey || config.paystackPublicKey.includes('REPLACE_WITH')) {
-      alert('Paystack public key not configured. Open the script and set config.paystackPublicKey to your key.');
+      alert('Paystack public key not configured.');
       return;
     }
 
@@ -1394,12 +1393,12 @@ function printReceipt(data) {
       </head>
       <body>
         <div class="page">
-          <div class="banner">SweetLove Gifts &nbsp;&nbsp;&nbsp;&nbsp; Receipt</div>
+          <div class="banner">BêllaBox &nbsp;&nbsp;&nbsp;&nbsp; Receipt</div>
 
           <div class="container">
             <div class="box meta">
               <h4>Seller</h4>
-              <div class="kv"><div>SweetLove Gifts</div><div></div></div>
+              <div class="kv"><div>BêllaBox</div><div></div></div>
               <div class="kv"><div>Contact</div><div>0205237411</div></div>
               <div class="kv"><div>Website</div><div>SweetLove Gifts</div></div>
             </div>
@@ -1440,7 +1439,7 @@ function printReceipt(data) {
 
           <div class="foot">
             <div>Payment reference: <code class="ref">${escapeHtml(data.payRef || '')}</code></div>
-            <div style="margin-top:8px">Note: Delivery charges (if any) will be communicated after payment. Thank you for choosing SweetLove Gifts.</div>
+            <div style="margin-top:8px">Note: Delivery charges (if any) will be communicated after payment. Thank you for choosing BêllaBox.</div>
           </div>
         </div>
       </body>
@@ -1456,7 +1455,7 @@ function printReceipt(data) {
 
 async function downloadPdfReceipt(data) {
   if (!window.jspdf || !window.jspdf.jsPDF) {
-    alert('PDF generator not loaded. Add jsPDF to the page to download receipts.');
+    alert('PDF generator not loaded.');
     return;
   }
   const { jsPDF } = window.jspdf;
