@@ -446,6 +446,230 @@
   .modal.payment-success{border-radius:0;height:92vh;overflow:auto;padding:14px}
   .modal.payment-success .modal-actions{gap:8px}
 }
+/* ---------------------------
+   Payment success modal (phone-perfect + safe-area)
+   --------------------------- */
+
+/* Backdrop */
+.modal-backdrop.payment-success{
+  position:fixed;
+  inset:0;
+  background:rgba(10,11,13,0.48);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10050;
+
+  /* Important: safe padding so iOS notch + browser bars don't cover modal */
+  padding: max(14px, env(safe-area-inset-top))
+           max(14px, env(safe-area-inset-right))
+           max(14px, env(safe-area-inset-bottom))
+           max(14px, env(safe-area-inset-left));
+}
+
+/* Modal shell */
+.modal.payment-success{
+  width:820px;
+  max-width:100%;
+  background:var(--surface);
+  color:var(--text);
+  border-radius:14px;
+  padding:18px;
+  border:1px solid rgba(31,31,35,0.06);
+  box-shadow:0 40px 90px rgba(31,31,35,0.12);
+  font-family:inherit;
+
+  /* Key fix: never exceed the visible viewport (even with mobile browser UI) */
+  max-height: calc(100svh - max(28px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+  overflow:hidden;
+
+  /* Make header/body/actions behave properly */
+  display:flex;
+  flex-direction:column;
+}
+
+/* Header */
+.modal.payment-success .modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  flex:0 0 auto;
+}
+
+.modal.payment-success .modal-title{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  min-width:0;
+}
+
+.modal.payment-success .modal-title h3{
+  margin:0;
+  font-size:18px;
+  font-weight:800;
+}
+
+.modal.payment-success .modal-sub{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+/* Close button */
+.modal.payment-success .modal-close{
+  background:transparent;
+  border:0;
+  color:var(--muted);
+  font-size:18px;
+  padding:8px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.modal.payment-success .modal-close:hover{
+  color:var(--text);
+  background:rgba(31,31,35,0.03);
+}
+.modal.payment-success .modal-close:focus{
+  outline:3px solid rgba(255,122,162,0.12);
+  outline-offset:3px;
+}
+
+/* Body: scroll INSIDE modal (so nothing is hidden behind browser bars) */
+.modal.payment-success .modal-body{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  align-items:start;
+
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-right:6px; /* space for scrollbar */
+  flex:1 1 auto;
+}
+
+.modal.payment-success .section-title{
+  font-weight:700;
+  margin:0 0 8px 0;
+}
+
+.modal.payment-success .kv{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:6px 0;
+  border-bottom:1px solid rgba(31,31,35,0.03);
+}
+.modal.payment-success .kv .label{
+  color:var(--muted);
+}
+.modal.payment-success .kv .value{
+  font-weight:700;
+  text-align:right;
+  word-break:break-word;
+}
+
+.modal.payment-success .small-note{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:8px;
+}
+
+/* Code/reference styling */
+.modal.payment-success code.ref{
+  background:rgba(31,31,35,0.03);
+  padding:6px 8px;
+  border-radius:8px;
+  font-weight:700;
+  color:var(--accent);
+  display:inline-block;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+
+/* Actions: sticky so buttons are always visible on phones */
+.modal.payment-success .modal-actions{
+  margin-top:12px;
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+
+  flex:0 0 auto;
+  position:sticky;
+  bottom:0;
+  background:linear-gradient(180deg, rgba(255,255,255,0.75), var(--surface));
+  padding-top:10px;
+  padding-bottom:max(10px, env(safe-area-inset-bottom));
+  border-top:1px solid rgba(31,31,35,0.05);
+}
+
+/* Buttons in modal */
+.modal.payment-success .btn.action-primary{
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:var(--accent-contrast);
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 10px 30px rgba(255,122,162,0.10);
+}
+.modal.payment-success .btn.action-primary:focus{
+  outline:3px solid rgba(255,122,162,0.12);
+  outline-offset:2px;
+}
+
+.modal.payment-success .outline.action-secondary{
+  background:transparent;
+  border:1px solid rgba(31,31,35,0.08);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* Make header wrap cleanly on small screens */
+@media (max-width:520px){
+  .modal.payment-success .modal-header{
+    flex-wrap:wrap;
+  }
+  .modal.payment-success .modal-close{
+    margin-left:auto;
+  }
+}
+
+/* Responsive: single column on small devices */
+@media (max-width:720px){
+  .modal.payment-success{
+    width:100%;
+    border-radius:12px;
+    padding:14px;
+  }
+  .modal.payment-success .modal-body{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  .modal.payment-success .modal-title h3{font-size:16px;}
+  .modal.payment-success .modal-sub{font-size:12px;}
+
+  .modal.payment-success .modal-actions{
+    justify-content:stretch;
+  }
+  .modal.payment-success .modal-actions .btn,
+  .modal.payment-success .modal-actions .outline{
+    flex:1 1 auto;
+  }
+}
+
+/* Very small screens: use dvh for mobile browser UI changes */
+@media (max-width:420px){
+  .modal.payment-success{
+    max-height: calc(100dvh - max(28px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+  }
+}
 
 </style>
 
