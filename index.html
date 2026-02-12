@@ -1191,14 +1191,14 @@ function showContactModal() {
     const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
     if (method === 'pickup') {
       // Autofill pickup address, make read-only
-      addressEl.value = 'UPSA hostel';
+      addressEl.value = 'Laundry Dirt to Bright, East Legon';
       addressEl.setAttribute('readonly', 'true');
       addressEl.setAttribute('aria-readonly', 'true');
       addressEl.placeholder = '';
-      showSmallNote('Pickup selected. Pickup address set to UPSA hostel.');
+      showSmallNote('Pickup selected. Pickup address set to Laundry Dirt to Bright, East Legon.');
     } else {
       // Delivery selected: enable address and prompt
-      if (addressEl.value.trim() === 'UPSA hostel') addressEl.value = '';
+      if (addressEl.value.trim() === 'Laundry Dirt to Bright, East Legon') addressEl.value = '';
       addressEl.removeAttribute('readonly');
       addressEl.removeAttribute('aria-readonly');
       addressEl.placeholder = "Enter delivery address. Delivery charges will be arranged after payment";
@@ -1366,7 +1366,7 @@ if (!isValidEmail(buyerEmail)) { alert('Please enter a valid email address (e.g.
 
     // enforce address rules
     if (method === 'pickup') {
-      address = 'UPSA hostel';
+      address = 'Laundry Dirt to Bright, East Legon';
     } else {
       if (!address) { alert('Please enter your delivery address. Delivery charges will be arranged after payment.'); addressEl.focus(); return; }
     }
@@ -1400,7 +1400,7 @@ if (!isValidEmail(buyerEmail)) { alert('Please enter a valid email address (e.g.
         { display_name: 'Flavor', variable_name: 'flavor', value: (state.name === 'Chocolate' ? chocoOptionEl.value : 'N/A') },
         { display_name: 'Address', variable_name: 'address', value: address },
         { display_name: 'ProcessingFee', variable_name: 'processing_fee', value: processingFee },
-        { display_name: 'DeliveryNote', variable_name: 'delivery_note', value: method === 'delivery' ? 'Delivery charges to be communicated after payment' : 'Pickup at UPSA hostel' }
+        { display_name: 'DeliveryNote', variable_name: 'delivery_note', value: method === 'delivery' ? 'Delivery charges to be communicated after payment' : 'Pickup at Laundry Dirt to Bright, East Legon' }
       ]
     };
 
