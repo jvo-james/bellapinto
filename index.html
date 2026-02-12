@@ -802,6 +802,22 @@
     <input id="phone" type="tel" class="styled-input" placeholder="e.g. 024xxxxxxxx" aria-required="true" inputmode="tel" pattern="[0-9+\s()-]{7,}" />
   </div>
 </div>
+<div class="field">
+  <label for="email">Email address</label>
+  <div class="input-row">
+    <div class="input-icon" aria-hidden="true"><i class="fa-solid fa-envelope"></i></div>
+    <input
+      id="email"
+      type="email"
+      class="styled-input"
+      placeholder="e.g. bella@gmail.com"
+      aria-required="true"
+      autocomplete="email"
+      inputmode="email"
+      required
+    />
+  </div>
+</div>
 
 
           <div class="field">
@@ -868,6 +884,12 @@
   const el = (id) => document.getElementById(id);
 
   const formatCurrency = (n) => `${config.currencySymbol} ${Number(n).toFixed(2)}`;
+
+  function isValidEmail(email) {
+  const e = String(email || '').trim();
+  // Simple & reliable email check (good enough for client-side)
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(e);
+}
 
 function showToast(message, opts = {}) {
   // opts: { duration: ms (number), type: 'info'|'success'|'error' } — type reserved for future use
@@ -1226,7 +1248,7 @@ function showContactModal() {
       order_id: data.orderId || '',
       payment_reference: data.payRef || '',
       buyer_name: data.buyerName || '',
-      buyer_email: (data.buyerEmail || `${(data.buyerName||'').replace(/\s+/g,'').toLowerCase()}@example.com`),
+      buyer_email: data.buyerEmail || '',
       phone: data.phone || '',
       package: state.name || '',
       flavor: data.chosenChocolate || (state.name === 'Chocolate' ? 'N/A' : ''),
@@ -1328,11 +1350,14 @@ function showContactModal() {
     if (!state.name) { alert('Please choose a package first.'); return; }
     const buyerName = (el('name')?.value || '').trim();
     const phone = (el('phone')?.value || '').trim();
+    const buyerEmail = (el('email')?.value || '').trim();
     let address = (addressEl?.value || '').trim();
     const method = document.querySelector('input[name="method"]:checked')?.value || 'delivery';
 
     if (!buyerName) { alert('Please enter a name.'); el('name').focus(); return; }
     if (!phone) { alert('Please enter a phone number.'); el('phone').focus(); return; }
+   if (!buyerEmail) { alert('Please enter an email address.'); el('email').focus(); return; }
+if (!isValidEmail(buyerEmail)) { alert('Please enter a valid email address (e.g. name@gmail.com).'); el('email').focus(); return; }
     if (state.name === 'Chocolate' && (!chocoOptionEl.value || chocoOptionEl.value === '')) {
       alert('Please choose a chocolate flavor for the Chocolate package.');
       chocoOptionEl.focus();
@@ -1384,7 +1409,7 @@ function showContactModal() {
     // open Paystack popup
     const handler = PaystackPop.setup({
       key: config.paystackPublicKey,
-      email: `${buyerName.replace(/\s+/g, '').toLowerCase() || 'buyer'}@example.com`,
+      email: buyerEmail,
       amount: amountInSmallest,
       currency: 'GHS',
       ref: uniqueRef,
@@ -1398,6 +1423,7 @@ function showContactModal() {
           orderId: uniqueRef,
           payRef: response.reference || uniqueRef,
           buyerName,
+          buyerEmail,
           phone,
           address,
           method,
@@ -1451,6 +1477,7 @@ function showSuccessModal(data) {
             <div class="kv"><div class="label">Quantity</div><div class="value">${escapeHtml(String(data.q || 1))}</div></div>
             <div class="kv"><div class="label">Delivery method</div><div class="value">${escapeHtml(data.method || 'N/A')}</div></div>
             <div class="kv"><div class="label">Phone</div><div class="value">${escapeHtml(data.phone || '')}</div></div>
+            <div class="kv"><div class="label">Email</div><div class="value">${escapeHtml(data.buyerEmail || '')}</div></div>
             <div class="kv"><div class="label">Address</div><div class="value">${escapeHtml(data.address || '')}</div></div>
             <div class="small-note">We will contact you about delivery charges if applicable.</div>
           </div>
@@ -1537,6 +1564,7 @@ function showSuccessModal(data) {
       `Payment reference: ${data.payRef}`,
       `Buyer: ${data.buyerName}`,
       `Phone: ${data.phone}`,
+      `Email: ${data.buyerEmail || ''}`,
       `Package: ${state.name}`,
       `Flavor: ${state.name === 'Chocolate' ? (data.chosenChocolate || 'N/A') : 'N/A'}`,
       `Quantity: ${data.q}`,
@@ -1631,6 +1659,7 @@ function printReceipt(data) {
               <h4>Customer</h4>
               <div class="kv"><div>Name</div><div>${escapeHtml(data.buyerName || '')}</div></div>
               <div class="kv"><div>Phone</div><div>${escapeHtml(data.phone || '')}</div></div>
+             <div class="kv"><div>Email</div><div>${escapeHtml(data.buyerEmail || '')}</div></div>
               <div class="kv"><div>Order ID</div><div><code class="ref">${escapeHtml(data.orderId || '')}</code></div></div>
             </div>
           </div>
